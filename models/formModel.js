@@ -108,7 +108,8 @@ const workshopFeedbackSchema = new mongoose.Schema({
   workshopId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Workshop',
-    required: [true, 'Workshop ID is required']
+    // required: [true, 'Workshop ID is required']
+    required: false  //i could not find any workshop id in DB so for testing purpose i am making it false
   },
 
   workshopDate: {

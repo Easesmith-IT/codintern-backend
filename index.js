@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/connectDB");
 const { submitFeedback } = require("./controller/feedbackController");
+const cors = require("cors");
 
 dotenv.config(); 
 
@@ -9,6 +10,15 @@ const app = express();
 
 
 app.use(express.json());
+app.use(
+  cors({
+    origin: [
+      process.env.DEV_FRONT_END_URL,
+      process.env.PROD_FRONT_END_URL,
+    ],
+    credentials: true,
+  })
+);
 
 // Connect to MongoDB
 connectDB();

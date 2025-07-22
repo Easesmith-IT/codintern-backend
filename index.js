@@ -13,8 +13,10 @@ app.use(express.json());
 app.use(
   cors({
     origin: [
-      process.env.DEV_FRONT_END_URL,
-      process.env.PROD_FRONT_END_URL,
+      "http://localhost:3000",
+      "https://cod-intern-frontend.vercel.app",
+      // process.env.DEV_FRONT_END_URL,
+      // process.env.PROD_FRONT_END_URL,
     ],
     credentials: true,
   })

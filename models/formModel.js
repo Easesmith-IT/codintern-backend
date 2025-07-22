@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
+
 
 // Define the schema for workshop feedback
 const workshopFeedbackSchema = new mongoose.Schema({
@@ -100,10 +102,21 @@ const workshopFeedbackSchema = new mongoose.Schema({
   },
 
   // Metadata
-  submittedAt: {
-    type: Date,
-    default: Date.now
-  },
+//   submittedAt: {
+//     type: Date,
+//     default: Date.now
+//   },
+// Metadata
+uid: {  //generate uid using uuid
+  type: String,
+  default: uuidv4,
+  unique: true
+},
+
+submittedAt: {
+  type: Date,
+  default: Date.now
+},
 
   workshopId: {
     type: mongoose.Schema.Types.ObjectId,

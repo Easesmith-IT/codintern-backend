@@ -15,6 +15,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://cod-intern-frontend.vercel.app",
+      "https://www.codintern.com",
       // process.env.DEV_FRONT_END_URL,
       // process.env.PROD_FRONT_END_URL,
     ],

@@ -26,13 +26,21 @@ const workshopFeedbackSchema = new mongoose.Schema({
     maxLength: [100, 'College name cannot exceed 100 characters']
   },
 
-  enrolmentNumber: {
-    type: String,
-    required: [true, 'Enrolment number is required'],
-    trim: true,
-    unique: true,
-    maxLength: [20, 'Enrolment number cannot exceed 20 characters']
-  },
+  // enrolmentNumber: {
+  //   type: String,
+  //   required: [true, 'Enrolment number is required'],
+  //   trim: true,
+  //   unique: true,
+  //   maxLength: [20, 'Enrolment number cannot exceed 20 characters']
+  // },
+enrolmentNumber: {
+  type: String,
+  required: false, 
+  trim: true,
+  unique: true,
+  sparse: true, 
+  maxLength: [20, 'Enrolment number cannot exceed 20 characters']
+},
 
   contactNumber: {
     type: String,

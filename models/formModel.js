@@ -37,7 +37,7 @@ enrolmentNumber: {
   type: String,
   required: false, 
   trim: true,
-  unique: true,
+  unique: false,
   sparse: true, 
   maxLength: [20, 'Enrolment number cannot exceed 20 characters']
 },

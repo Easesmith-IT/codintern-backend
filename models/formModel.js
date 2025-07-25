@@ -37,7 +37,7 @@ enrolmentNumber: {
   type: String,
   required: false, 
   trim: true,
-  unique: true,
+  // unique: true,
   sparse: true, 
   maxLength: [20, 'Enrolment number cannot exceed 20 characters']
 },
@@ -143,7 +143,7 @@ submittedAt: {
 });
 
 // Indexes for better query performance
-workshopFeedbackSchema.index({ enrolmentNumber: 1 }); // Unique index
+// workshopFeedbackSchema.index({ enrolmentNumber: 1 }); // Unique index
 workshopFeedbackSchema.index({ emailId: 1 });
 workshopFeedbackSchema.index({ workshopId: 1 });
 workshopFeedbackSchema.index({ submittedAt: -1 });

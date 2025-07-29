@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/connectDB");
 const { submitFeedback } = require("./controller/feedbackController");
 const cors = require("cors");
+const studentAuthRoutes = require("./routes/studentAuthRoutes");
 
 dotenv.config(); 
 
@@ -33,8 +34,9 @@ app.get("/", (req, res) => {
 
 
 app.use('/api/feedBack',submitFeedback)
+app.use("/api/student/auth", studentAuthRoutes);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

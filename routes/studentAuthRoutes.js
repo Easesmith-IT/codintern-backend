@@ -1,9 +1,23 @@
 const express = require("express");
-const { signup, verifyOtp } = require("../controller/studentAuthController");
+const {
+  signup,
+  verifyOtp,
+  login,
+  logout,
+  signup2,
+  resendOtp,
+} = require("../controllers/studentAuthController");
 const router = express.Router();
 
-// POST /api/user/auth/signup
 router.post("/signup", signup);
+router.patch("/signup-2", signup2);
+
 router.post("/verify-otp", verifyOtp);
+router.post("/resend-otp", resendOtp);
+
+router.post("/login", login);
+
+router.post("/logout", logout);
+
 
 module.exports = router;

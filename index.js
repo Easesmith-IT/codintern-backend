@@ -1,16 +1,38 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/connectDB");
-const { submitFeedback } = require("./controller/feedbackController");
-const cors = require("cors");
+const { submitFeedback } = require("./controllers/feedbackController");
 const studentAuthRoutes = require("./routes/studentAuthRoutes");
+const studentMainRoutes = require("./routes/studentMainRoutes");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
+const cookieParser = require("cookie-parser");
+const path = require("path");
 
-dotenv.config(); 
+dotenv.config();
 
 const app = express();
 
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 1000,
+  message: "Too many requests from this IP, please try again later.",
+});
+
+app.use(limiter);
+
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 
 app.use(express.json());
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(cookieParser());
+app.use("/images", express.static(path.join(__dirname, "images")));
+
 app.use(
   cors({
     origin: [
@@ -32,9 +54,9 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-
-app.use('/api/feedBack',submitFeedback)
+app.use("/api/feedBack", submitFeedback);
 app.use("/api/student/auth", studentAuthRoutes);
+app.use("/api/student/main", studentMainRoutes);
 
 const PORT = process.env.PORT || 4001;
 app.listen(PORT, () => {

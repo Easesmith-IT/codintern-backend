@@ -18,18 +18,10 @@ const educationSchema = new mongoose.Schema(
   {
     level: {
       type: String,
-      enum: [
-        "10th",
-        "12th",
-        "Diploma",
-        "Bachelor's",
-        "Master's",
-        "PhD",
-        "Other",
-      ],
+      enum: ["10th", "12th", "Diploma", "Bachelors", "Masters", "PhD", "Other"],
       required: true,
     },
-    institutionName: { type: String, required: true, trim: true },
+    institutionName: { type: String, trim: true },
     boardOrUniversity: { type: String, trim: true },
     streamOrSpecialization: { type: String, trim: true },
     gradeFormat: {
@@ -39,17 +31,17 @@ const educationSchema = new mongoose.Schema(
     },
     grade: {
       type: Number,
-      required: function () {
-        return !this.isPursuing;
-      },
+      // required: function () {
+      //   return !this.isPursuing;
+      // },
     },
     isPursuing: { type: Boolean, default: false },
     startYear: { type: Number },
     endYear: {
       type: Number,
-      required: function () {
-        return !this.isPursuing;
-      },
+      // required: function () {
+      //   return !this.isPursuing;
+      // },
     },
     certificateUrl: { type: String },
     description: { type: String, trim: true },
@@ -125,7 +117,7 @@ const studentSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      unique: true,
+      // unique: true,
       lowercase: true,
       validate: {
         validator: (v) => /^[\w\.-]+@[\w\.-]+\.\w+$/.test(v),
@@ -146,6 +138,10 @@ const studentSchema = new mongoose.Schema(
     bio: { type: String, trim: true },
     currentRole: { type: String },
     profileVisibility: { type: Boolean, default: false },
+    contactMethod: {
+      type: String,
+      required: false,
+    },
 
     // Authentication
     authProvider: {
@@ -197,6 +193,36 @@ const studentSchema = new mongoose.Schema(
       subtitles: { type: Boolean, default: false },
       courseLanguage: { type: String, default: "english" },
       weeklyLearningGoal: { type: Number, default: 4 },
+    },
+    bringsYouHere: {
+      type: [String], // array of strings
+      default: [],
+    },
+    areaOfInterest: {
+      tech: {
+        type: [String],
+        default: [],
+      },
+      business: {
+        type: [String],
+        default: [],
+      },
+      creative: {
+        type: [String],
+        default: [],
+      },
+      academic: {
+        type: [String],
+        default: [],
+      },
+    },
+    currentRole: {
+      type: String,
+    },
+    refreshToken: String,
+    tokenVersion: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }

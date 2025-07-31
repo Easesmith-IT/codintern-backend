@@ -31,7 +31,7 @@ exports.changePassword = catchAsync(async (req, res) => {
   res.status(200).json({ message: "Password changed successfully" });
 });
 
-exports.updateProfile = async (req, res) => {
+exports.updateProfile = catchAsync(async (req, res) => {
   try {
     const studentId = req.user._id;
 
@@ -40,6 +40,7 @@ exports.updateProfile = async (req, res) => {
 
     const image = req?.file;
 
+    
     const updates = {};
 
     if (name !== undefined) updates.name = name;
@@ -69,7 +70,28 @@ exports.updateProfile = async (req, res) => {
     console.error("Update Profile Error:", err);
     res.status(500).json({
       success: false,
-      message: "Something went wrong",
+      message: err.message,
     });
   }
-};
+});
+
+exports.getProfile = catchAsync(async (req, res) => {
+  const studentId = req.user._id;
+
+  const student = await Student.findById(studentId).select(
+    "-password -refreshToken"
+  ); // exclude sensitive fields
+
+  if (!student) {
+    return res.status(404).json({
+      success: false,
+      message: "Student not found",
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Profile fetched successfully",
+    student,
+  });
+});

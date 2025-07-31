@@ -18,7 +18,16 @@ const educationSchema = new mongoose.Schema(
   {
     level: {
       type: String,
-      enum: ["10th", "12th", "Diploma", "Bachelors", "Masters", "PhD", "Other"],
+      enum: [
+        "10th",
+        "12th",
+        "Diploma",
+        "Bachelors",
+        "Masters",
+        "PhD",
+        "Other",
+        "Doctorate",
+      ],
       required: true,
     },
     institutionName: { type: String, trim: true },
@@ -141,6 +150,10 @@ const studentSchema = new mongoose.Schema(
     contactMethod: {
       type: String,
       required: false,
+    },
+    rememberMe: {
+      type: Boolean,
+      default: false,
     },
 
     // Authentication

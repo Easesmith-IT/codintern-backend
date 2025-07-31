@@ -9,6 +9,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   console.log("Cookies:", req.cookies);
   const { accessToken = "", refreshToken = "" } = req.cookies || {};
 
+  const isProduction = process.env.NODE_ENV === "production";
+
   // Check if refresh token exists
   if (!refreshToken || refreshToken === "undefined") {
     return next(new AppError("Not authorized to access this route", 401));
@@ -24,6 +26,12 @@ exports.protect = catchAsync(async (req, res, next) => {
       let user = await Student.findById(decoded.id);
 
       if (user) {
+        res.cookie("isAuthenticated", true, {
+          httpOnly: false,
+          secure: true,
+          sameSite: isProduction ? "strict" : "none",
+          maxAge: 90 * 24 * 60 * 60 * 1000,
+        });
         req.user = user;
         return next();
       }
@@ -71,6 +79,13 @@ exports.protect = catchAsync(async (req, res, next) => {
         maxAge: 5 * 60 * 1000,
       });
 
+      res.cookie("isAuthenticated", true, {
+        httpOnly: false,
+        secure: true,
+        sameSite: isProduction ? "strict" : "none",
+        maxAge: 90 * 24 * 60 * 60 * 1000,
+      });
+
       // Send new token in header for frontend to update
       res.setHeader("X-New-Token", newAccessToken);
       res.setHeader("X-Token-Refreshed", "true");
@@ -84,5 +99,11 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // If we reach here, both tokens are missing or invalid
+  res.cookie("isAuthenticated", false, {
+    httpOnly: false,
+    secure: true,
+    sameSite: isProduction ? "strict" : "none",
+    maxAge: 90 * 24 * 60 * 60 * 1000,
+  });
   return next(new AppError("Authentication required - please login", 401));
 });

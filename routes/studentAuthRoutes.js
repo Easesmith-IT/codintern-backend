@@ -6,6 +6,7 @@ const {
   logout,
   signup2,
   resendOtp,
+  checkAuthStatus,
 } = require("../controllers/studentAuthController");
 const router = express.Router();
 
@@ -19,5 +20,6 @@ router.post("/login", login);
 
 router.post("/logout", logout);
 
+router.get("/status", checkAuthStatus);
 
 module.exports = router;

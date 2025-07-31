@@ -8,9 +8,11 @@ const {
   generateAccessToken,
   setTokenCookies,
 } = require("../utils/token");
+const AppError = require("../utils/appError");
+const jwt = require("jsonwebtoken");
 
 exports.signup = catchAsync(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, rememberMe } = req.body;
 
   // Basic validation
   if (!name || !email || !password) {
@@ -32,6 +34,7 @@ exports.signup = catchAsync(async (req, res) => {
     emailId: email,
     password: hashedPassword,
     authProvider: "local",
+    rememberMe,
   });
 
   await student.save();
@@ -66,7 +69,6 @@ exports.resendOtp = catchAsync(async (req, res) => {
 
   res.status(200).json({ message: "OTP resent successfully" });
 });
-
 
 exports.verifyOtp = catchAsync(async (req, res) => {
   const { email, otp } = req.body;
@@ -134,10 +136,16 @@ exports.login = catchAsync(async (req, res) => {
   student.refreshToken = refreshToken;
   await student.save();
 
+  const userInfo = {
+    name: student.name,
+    email: student.emailId,
+    image: student.image,
+  };
   setTokenCookies({
     res,
     accessToken,
     refreshToken,
+    userInfo,
   });
 
   // 5. Send response
@@ -268,5 +276,135 @@ exports.signup2 = catchAsync(async (req, res) => {
   res.status(200).json({
     message: "Updated student info successfully",
     student,
+  });
+});
+
+exports.checkAuthStatus = catchAsync(async (req, res, next) => {
+  console.log("=== DEBUG: Inside protect middleware ===");
+  console.log("Cookies:", req.cookies);
+  const { accessToken, refreshToken } = req.cookies || {};
+  console.log("Cookies: refreshToken", refreshToken);
+
+  const isProduction = process.env.NODE_ENV === "production";
+
+  // Check if refresh token exists
+  if (!refreshToken || refreshToken === "undefined") {
+    return res.status(200).json({
+      success: true,
+      isAuthenticated: false,
+      message: "refresh token expired",
+      shouldLoggOut: true,
+    });
+  }
+
+  // First try to verify access token
+  if (accessToken && accessToken !== "undefined") {
+    try {
+      const decoded = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET);
+      console.log("Access token decoded:", decoded);
+
+      // Find user based on role
+      let user = await Student.findById(decoded.id);
+
+      if (user) {
+        res.cookie("isAuthenticated", true, {
+          httpOnly: false,
+          secure: true,
+          sameSite: isProduction ? "strict" : "none",
+          maxAge: 90 * 24 * 60 * 60 * 1000,
+        });
+        return res.status(200).json({
+          success: true,
+          isAuthenticated: true,
+          data: {
+            id: user._id,
+            name: user.name,
+            email: user.emailId,
+          },
+        });
+      }
+    } catch (error) {
+      console.log("Access token verification failed:", error.message);
+      // Don't return error here, fall through to refresh token logic
+    }
+  }
+
+  // If access token is invalid/expired, try refresh token
+  if (refreshToken && refreshToken !== "undefined") {
+    try {
+      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+      console.log("Refresh token decoded:", decoded);
+
+      let user = await Student.findById(decoded.id);
+
+      console.log("User found:", user);
+      console.log(
+        "Token versions - User:",
+        user?.tokenVersion,
+        "Decoded:",
+        decoded.tokenVersion
+      );
+
+      // Verify token version
+      if (!user || user.tokenVersion !== decoded.tokenVersion) {
+        return next(
+          new AppError("Invalid refresh token - please login again", 401)
+        );
+      }
+
+      // Generate new access token
+      const newAccessToken = await generateAccessToken({
+        id: user?._id,
+        customId: user?.customId,
+        tokenVersion: user?.tokenVersion,
+      });
+
+      // Set new access token cookie
+      res.cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: process.env.NODE_ENV === "production" ? "strict" : "none",
+        maxAge: 5 * 60 * 1000,
+      });
+
+      res.cookie("isAuthenticated", true, {
+        httpOnly: false,
+        secure: true,
+        sameSite: isProduction ? "strict" : "none",
+        maxAge: 90 * 24 * 60 * 60 * 1000,
+      });
+
+      // Send new token in header for frontend to update
+      res.setHeader("X-New-Token", newAccessToken);
+      res.setHeader("X-Token-Refreshed", "true");
+
+      return res.status(200).json({
+        success: true,
+        isAuthenticated: true,
+        data: {
+          id: user._id,
+          name: user.name,
+          email: user.emailId,
+        },
+      });
+    } catch (error) {
+      console.log("Refresh token verification failed:", error.message);
+      return next(new AppError("Session expired - please login again", 401));
+    }
+  }
+
+  // If we reach here, both tokens are missing or invalid
+  res.cookie("isAuthenticated", false, {
+    httpOnly: false,
+    secure: true,
+    sameSite: isProduction ? "strict" : "none",
+    maxAge: 90 * 24 * 60 * 60 * 1000,
+  });
+  // return next(new AppError("Authentication required - please login", 401));
+  return res.status(200).json({
+    success: false,
+    isAuthenticated: false,
+    message: "Authentication required - please login",
+    shouldLoggOut: true,
   });
 });

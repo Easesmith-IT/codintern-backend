@@ -17,6 +17,7 @@ exports.setTokenCookies = (data) => {
     refreshTokenMaxAge = 90 * 24 * 60 * 60 * 1000,
     accessToken,
     accessTokenMaxAge = 5 * 60 * 1000,
+    userInfo,
   } = data || {};
 
   const isProduction = process.env.NODE_ENV === "production";
@@ -34,6 +35,20 @@ exports.setTokenCookies = (data) => {
     httpOnly: true,
     secure: true,
     sameSite: isProduction ? "strict" : "none",
-    maxAge: accessTokenMaxAge, // 5 mins
+    maxAge: accessTokenMaxAge,
+  });
+
+  res.cookie("isAuthenticated", true, {
+    httpOnly: false,
+    secure: true,
+    sameSite: isProduction ? "strict" : "none",
+    maxAge: refreshTokenMaxAge,
+  });
+
+  res.cookie("userInfo", JSON.stringify(userInfo), {
+    httpOnly: false,
+    secure: true,
+    sameSite: isProduction ? "strict" : "none",
+    maxAge: refreshTokenMaxAge,
   });
 };

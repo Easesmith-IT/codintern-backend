@@ -29,7 +29,8 @@ exports.protect = catchAsync(async (req, res, next) => {
         res.cookie("isAuthenticated", true, {
           httpOnly: false,
           secure: true,
-          sameSite: isProduction ? "strict" : "none",
+          // sameSite: isProduction ? "strict" : "none",
+          sameSite: "none",
           maxAge: 90 * 24 * 60 * 60 * 1000,
         });
         req.user = user;
@@ -75,14 +76,16 @@ exports.protect = catchAsync(async (req, res, next) => {
       res.cookie("accessToken", newAccessToken, {
         httpOnly: true,
         secure: true,
-        sameSite: process.env.NODE_ENV === "production" ? "strict" : "none",
+        // sameSite: isProduction ? "strict" : "none",
+        sameSite: "none",
         maxAge: 5 * 60 * 1000,
       });
 
       res.cookie("isAuthenticated", true, {
         httpOnly: false,
         secure: true,
-        sameSite: isProduction ? "strict" : "none",
+        // sameSite: isProduction ? "strict" : "none",
+        sameSite: "none",
         maxAge: 90 * 24 * 60 * 60 * 1000,
       });
 
@@ -102,7 +105,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   res.cookie("isAuthenticated", false, {
     httpOnly: false,
     secure: true,
-    sameSite: isProduction ? "strict" : "none",
+    // sameSite: isProduction ? "strict" : "none",
+    sameSite: "none",
     maxAge: 90 * 24 * 60 * 60 * 1000,
   });
   return next(new AppError("Authentication required - please login", 401));

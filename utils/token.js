@@ -26,7 +26,8 @@ exports.setTokenCookies = (data) => {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: true,
-    sameSite: isProduction ? "strict" : "none",
+    // sameSite: isProduction ? "strict" : "none",
+    sameSite: "none",
     maxAge: refreshTokenMaxAge,
   });
 
@@ -34,21 +35,24 @@ exports.setTokenCookies = (data) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: true,
-    sameSite: isProduction ? "strict" : "none",
+    // sameSite: isProduction ? "strict" : "none",
+    sameSite: "none",
     maxAge: accessTokenMaxAge,
   });
 
   res.cookie("isAuthenticated", true, {
     httpOnly: false,
     secure: true,
-    sameSite: isProduction ? "strict" : "none",
+    // sameSite: isProduction ? "strict" : "none",
+    sameSite: "none",
     maxAge: refreshTokenMaxAge,
   });
 
   res.cookie("userInfo", JSON.stringify(userInfo), {
     httpOnly: false,
     secure: true,
-    sameSite: isProduction ? "strict" : "none",
+    // sameSite: isProduction ? "strict" : "none",
+    sameSite: "none",
     maxAge: refreshTokenMaxAge,
   });
 };

@@ -8,7 +8,7 @@ exports.getOtpEmailTemplate = (otp) => {
         ${otp}
       </div>
       <p>If you did not request this code, you can safely ignore this email.</p>
-      <p style="margin-top: 40px;">Best regards,<br/><strong>Easesmith Team</strong></p>
+      <p style="margin-top: 40px;">Best regards,<br/><strong>Codintern Team</strong></p>
     </div>
   `;
 };

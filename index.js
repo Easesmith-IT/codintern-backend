@@ -1,5 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
+dotenv.config();
+
 const connectDB = require("./config/connectDB");
 const { submitFeedback } = require("./controllers/feedbackController");
 const studentAuthRoutes = require("./routes/studentAuthRoutes");
@@ -13,7 +15,11 @@ const path = require("path");
 const passport = require("passport");
 const session = require("express-session");
 
-dotenv.config();
+// require("dotenv").config({
+//   path: path.join(__dirname, "/.env"),
+// });
+
+
 
 require("./passport");
 

@@ -185,6 +185,7 @@ exports.login = catchAsync(async (req, res) => {
       name: student.name,
       emailId: student.emailId,
     },
+    callbackUrl:process.env.GOOGLE_CALLBACK_URL
   });
 });
 

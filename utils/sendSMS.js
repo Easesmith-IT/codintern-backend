@@ -51,7 +51,7 @@ const { resend } = require("./resend");
 //   }
 // };
 
-exports.sendOtpEmail = async (email) => {
+exports.sendOtpEmail = async (email,res) => {
   try {
     const otp = Math.floor(100000 + Math.random() * 900000);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
@@ -67,18 +67,11 @@ exports.sendOtpEmail = async (email) => {
     const htmlContent = getOtpEmailTemplate(otp);
 
     try {
-      const response = await resend.emails.send({
+      await resend.emails.send({
         from: "Codintern <no-reply@codintern.com>",
         to: email,
         subject: "Your OTP Code",
         html: htmlContent,
-      });
-
-      console.log("Email sent:", response);
-      return res.status(200).json({
-        success: true,
-        message: "OTP sent successfully",
-        data: response, // Optional
       });
     } catch (error) {
       console.error("Failed to send email:", error);

@@ -39,11 +39,11 @@ exports.signup = catchAsync(async (req, res) => {
 
   await student.save();
 
-  await sendOtpEmail(email);
+  await sendOtpEmail(email,res);
 
   // Return minimal user data
   res.status(201).json({
-    message: "User registered successfully",
+    message: "User registered successfully. Please verify your email.",
     student: {
       _id: student._id,
       customId: student?.customId,
@@ -65,7 +65,7 @@ exports.resendOtp = catchAsync(async (req, res) => {
     return res.status(404).json({ message: "No user found with that email" });
   }
 
-  await sendOtpEmail(email);
+  await sendOtpEmail(email, res);
 
   res.status(200).json({ message: "OTP resent successfully" });
 });
@@ -97,6 +97,33 @@ exports.verifyOtp = catchAsync(async (req, res) => {
   if (!student) {
     return res.status(404).json({ message: "Student not found" });
   }
+
+  // 4. Create JWT token and store in cookies
+  const refreshToken = await generateRefreshToken({
+    id: student?._id,
+    customId: student?.customId,
+    tokenVersion: student?.tokenVersion,
+  });
+  const accessToken = await generateAccessToken({
+    id: student?._id,
+    customId: student?.customId,
+    tokenVersion: student?.tokenVersion,
+  });
+
+  student.refreshToken = refreshToken;
+  await student.save();
+
+  const userInfo = {
+    name: student.name,
+    email: student.emailId,
+    image: student.image,
+  };
+  setTokenCookies({
+    res,
+    accessToken,
+    refreshToken,
+    userInfo,
+  });
 
   res.status(200).json({ message: "Email verified successfully" });
 });

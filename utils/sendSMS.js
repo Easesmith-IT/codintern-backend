@@ -1,4 +1,6 @@
 const Otp = require("../models/Otp");
+const { getOtpEmailTemplate } = require("../utils/emailTemplate");
+// const { resend } = require("./resend");
 
 // exports.sendOtpSms = async (phone) => {
 //   try {
@@ -61,10 +63,20 @@ exports.sendOtpEmail = async (email) => {
       { upsert: true }
     );
 
-    // TODO: Send via email service
+    // Send email
+    const htmlContent = getOtpEmailTemplate(otp);
+
+    // await resend.emails.send({
+    //   // from: "Easesmith <no-reply@easesmith.com>", // Replace with your domain
+    //   // from:"info@codintern.com",
+    //   from: "onboarding@resend.dev",
+    //   to: email,
+    //   subject: "Your OTP Code",
+    //   html: htmlContent,
+    // });
+
     console.log(`OTP for ${email}: ${otp}`);
   } catch (err) {
     console.error("OTP send error:", err);
   }
 };
-

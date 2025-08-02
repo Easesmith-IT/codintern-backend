@@ -161,6 +161,58 @@ exports.login = catchAsync(async (req, res) => {
   });
 });
 
+exports.googleCallback = catchAsync(async (req, res) => {
+  const { _json } = req.user || {};
+  console.log("_json", _json);
+  const { name, email, email_verified, sub } = _json || {};
+  const intent = req.query.state;
+
+  // 1. Find the student by email
+  let student = await Student.findOne({ emailId: email });
+  if (!student) {
+    student = new Student({
+      name,
+      emailId: email,
+      authProvider: "google",
+      emailVerified: email_verified,
+      providerId: sub,
+    });
+  }
+
+  await student.save();
+
+  // 2. Create JWT token and store in cookies
+  const refreshToken = await generateRefreshToken({
+    id: student?._id,
+    customId: student?.customId,
+    tokenVersion: student?.tokenVersion,
+  });
+  const accessToken = await generateAccessToken({
+    id: student?._id,
+    customId: student?.customId,
+    tokenVersion: student?.tokenVersion,
+  });
+
+  student.refreshToken = refreshToken;
+  await student.save();
+
+  const userInfo = {
+    name: student.name,
+    email: student.emailId,
+    image: student.image,
+  };
+  setTokenCookies({
+    res,
+    accessToken,
+    refreshToken,
+    userInfo,
+  });
+
+  intent === "signup"
+    ? res.redirect(`${process.env.FRONT_END_URL}/sign-up/information`)
+    : res.redirect(process.env.FRONT_END_URL);
+});
+
 exports.logout = catchAsync(async (req, res, next) => {
   const { email } = req.body;
 
@@ -178,6 +230,14 @@ exports.logout = catchAsync(async (req, res, next) => {
   student.tokenVersion = (student.tokenVersion || 0) + 1; // Increment instead of reset to 0
   await student.save();
 
+  await new Promise((resolve, reject) => {
+    req.logout((err) => {
+      if (err) return reject(err);
+      resolve();
+    });
+  });
+  req.session?.destroy();
+
   // Clear cookies
   setTokenCookies({
     res,
@@ -191,6 +251,10 @@ exports.logout = catchAsync(async (req, res, next) => {
     success: true,
     message: "Logged out from all devices",
   });
+});
+
+exports.failure = catchAsync(async (req, res, next) => {
+  res.redirect(`${process.env.FRONT_END_URL}/login`);
 });
 
 exports.signup2 = catchAsync(async (req, res) => {

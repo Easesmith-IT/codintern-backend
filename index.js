@@ -10,8 +10,12 @@ const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
 const path = require("path");
+const passport = require("passport");
+const session = require("express-session");
 
 dotenv.config();
+
+require("./passport");
 
 const app = express();
 
@@ -28,10 +32,20 @@ if (process.env.NODE_ENV === "development") {
 }
 
 app.use(express.json());
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.SESSION_SECRET,
+  })
+);
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
 app.use("/images", express.static(path.join(__dirname, "images")));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(
   cors({
@@ -39,8 +53,7 @@ app.use(
       "http://localhost:3000",
       "https://cod-intern-frontend.vercel.app",
       "https://www.codintern.com",
-      // process.env.DEV_FRONT_END_URL,
-      // process.env.PROD_FRONT_END_URL,
+      // process.env.FRONT_END_URL,
     ],
     credentials: true,
   })

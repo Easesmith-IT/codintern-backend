@@ -40,7 +40,6 @@ exports.updateProfile = catchAsync(async (req, res) => {
 
     const image = req?.file;
 
-    
     const updates = {};
 
     if (name !== undefined) updates.name = name;

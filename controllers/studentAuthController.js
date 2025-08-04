@@ -39,7 +39,7 @@ exports.signup = catchAsync(async (req, res) => {
 
   await student.save();
 
-  await sendOtpEmail(email,res);
+  await sendOtpEmail(email, res);
 
   // Return minimal user data
   res.status(201).json({
@@ -125,7 +125,14 @@ exports.verifyOtp = catchAsync(async (req, res) => {
     userInfo,
   });
 
-  res.status(200).json({ message: "Email verified successfully" });
+  res.status(200).json({
+    message: "Email verified successfully",
+    cookies: {
+      accessToken,
+      refreshToken,
+      userInfo,
+    },
+  });
 });
 
 exports.login = catchAsync(async (req, res) => {
@@ -168,17 +175,22 @@ exports.login = catchAsync(async (req, res) => {
     email: student.emailId,
     image: student.image,
   };
-  setTokenCookies({
-    res,
-    accessToken,
-    refreshToken,
-    userInfo,
-  });
+  // setTokenCookies({
+  //   res,
+  //   accessToken,
+  //   refreshToken,
+  //   userInfo,
+  // });
 
   // 5. Send response
   res.status(200).json({
     message: "Login successful",
     isAuthenticated: true,
+    cookies: {
+      accessToken,
+      refreshToken,
+      userInfo,
+    },
     student: {
       id: student._id,
       customId: student.customId,
@@ -233,6 +245,22 @@ exports.googleCallback = catchAsync(async (req, res) => {
     accessToken,
     refreshToken,
     userInfo,
+  });
+
+  res.status(200).json({
+    message: "Login successful",
+    isAuthenticated: true,
+    cookies: {
+      accessToken,
+      refreshToken,
+      userInfo,
+    },
+    student: {
+      id: student._id,
+      customId: student.customId,
+      name: student.name,
+      emailId: student.emailId,
+    },
   });
 
   intent === "signup"

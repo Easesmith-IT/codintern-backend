@@ -240,32 +240,35 @@ exports.googleCallback = catchAsync(async (req, res) => {
     email: student.emailId,
     image: student.image,
   };
-  setTokenCookies({
-    res,
-    accessToken,
-    refreshToken,
-    userInfo,
-  });
+  // setTokenCookies({
+  //   res,
+  //   accessToken,
+  //   refreshToken,
+  //   userInfo,
+  // });
 
-  res.status(200).json({
-    message: "Login successful",
-    isAuthenticated: true,
-    cookies: {
-      accessToken,
-      refreshToken,
-      userInfo,
-    },
-    student: {
-      id: student._id,
-      customId: student.customId,
-      name: student.name,
-      emailId: student.emailId,
-    },
-  });
+  // res.status(200).json({
+  //   message: "Login successful",
+  //   isAuthenticated: true,
+  //   cookies: {
+  //     accessToken,
+  //     refreshToken,
+  //     userInfo,
+  //   },
+  //   student: {
+  //     id: student._id,
+  //     customId: student.customId,
+  //     name: student.name,
+  //     emailId: student.emailId,
+  //   },
+  // });
 
+  const searchPrams = `accessToken=${accessToken}&refreshToken=${refreshToken}&userInfo=${encodeURIComponent(JSON.stringify(userInfo))}`;
   intent === "signup"
-    ? res.redirect(`${process.env.FRONT_END_URL}/sign-up/information`)
-    : res.redirect(process.env.FRONT_END_URL);
+    ? res.redirect(
+        `${process.env.FRONT_END_URL}/sign-up/information?${searchPrams}`
+      )
+    : res.redirect(`${process.env.FRONT_END_URL}?${searchPrams}`);
 });
 
 exports.logout = catchAsync(async (req, res, next) => {

@@ -32,10 +32,17 @@ exports.changePassword = catchAsync(async (req, res) => {
 });
 
 exports.updateProfile = catchAsync(async (req, res) => {
-  const studentId = req.user._id;
+  // const studentId = req.user._id;
 
-  const { name, emailId, phone, contactMethod, bio, profileVisibility } =
-    req.body;
+  const {
+    name,
+    emailId,
+    phone,
+    contactMethod,
+    bio,
+    profileVisibility,
+    studentId,
+  } = req.body;
 
   const image = req?.file;
 
@@ -67,7 +74,7 @@ exports.updateProfile = catchAsync(async (req, res) => {
 });
 
 exports.getProfile = catchAsync(async (req, res) => {
-  const studentId = req.user._id;
+  const studentId = req.query.studentId;
 
   const student = await Student.findById(studentId).select(
     "-password -refreshToken"

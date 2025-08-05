@@ -14,7 +14,7 @@ router.patch("/change-password", protect, changePassword);
 // 1. login with google and facebook
 // 2. forget password
 
-router.patch("/update-profile", protect, upload.single("image"), updateProfile);
-router.get("/get-profile", protect, getProfile);
+router.patch("/update-profile", upload.single("image"), updateProfile);
+router.get("/get-profile", getProfile);
 
 module.exports = router;

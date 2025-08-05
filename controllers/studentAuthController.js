@@ -334,6 +334,8 @@ exports.signup2 = catchAsync(async (req, res) => {
     educationLevel = "",
   } = req.body;
 
+  console.log("req.body",req.body);
+  
   // 1. Basic validation – check all required fields
   // const hasAtLeastOneInterest =
   //   (Array.isArray(tech) && tech.length > 0) ||

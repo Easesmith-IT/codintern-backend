@@ -14,12 +14,11 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 const passport = require("passport");
 const session = require("express-session");
+const globalErrorHandler = require("./controllers/errorController");
 
 // require("dotenv").config({
 //   path: path.join(__dirname, "/.env"),
 // });
-
-
 
 require("./passport");
 
@@ -80,4 +79,18 @@ app.use("/api/student/main", studentMainRoutes);
 const PORT = process.env.PORT || 4001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+app.use(globalErrorHandler);
+
+// Error handling
+process.on("uncaughtException", (err) => {
+  console.log("UNCAUGHT EXCEPTION! Shutting down...");
+  console.error(err);
+  process.exit(1);
+});
+process.on("unhandledRejection", (err) => {
+  console.log("UNHANDLED REJECTION! Shutting down...");
+  console.error(err);
+  server.close(() => process.exit(1));
 });

@@ -114,6 +114,8 @@ exports.verifyOtp = catchAsync(async (req, res) => {
   await student.save();
 
   const userInfo = {
+    id: student._id,
+    customId: student.customId,
     name: student.name,
     email: student.emailId,
     image: student.image,
@@ -171,6 +173,8 @@ exports.login = catchAsync(async (req, res) => {
   await student.save();
 
   const userInfo = {
+    id: student._id,
+    customId: student.customId,
     name: student.name,
     email: student.emailId,
     image: student.image,
@@ -236,6 +240,8 @@ exports.googleCallback = catchAsync(async (req, res) => {
   await student.save();
 
   const userInfo = {
+    id: student._id,
+    customId: student.customId,
     name: student.name,
     email: student.emailId,
     image: student.image,

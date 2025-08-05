@@ -32,46 +32,38 @@ exports.changePassword = catchAsync(async (req, res) => {
 });
 
 exports.updateProfile = catchAsync(async (req, res) => {
-  try {
-    const studentId = req.user._id;
+  const studentId = req.user._id;
 
-    const { name, emailId, phone, contactMethod, bio, profileVisibility } =
-      req.body;
+  const { name, emailId, phone, contactMethod, bio, profileVisibility } =
+    req.body;
 
-    const image = req?.file;
+  const image = req?.file;
 
-    const updates = {};
+  const updates = {};
 
-    if (name !== undefined) updates.name = name;
-    if (emailId !== undefined) updates.emailId = emailId;
-    if (phone !== undefined) updates.phone = phone;
-    if (contactMethod !== undefined) updates.contactMethod = contactMethod;
-    if (bio !== undefined) updates.bio = bio;
-    if (profileVisibility !== undefined)
-      updates.profileVisibility = profileVisibility;
+  if (name !== undefined) updates.name = name;
+  if (emailId !== undefined) updates.emailId = emailId;
+  if (phone !== undefined) updates.phone = phone;
+  if (contactMethod !== undefined) updates.contactMethod = contactMethod;
+  if (bio !== undefined) updates.bio = bio;
+  if (profileVisibility !== undefined)
+    updates.profileVisibility = profileVisibility;
 
-    if (image?.path) {
-      updates.image = image.path;
-    }
-
-    const updatedStudent = await Student.findByIdAndUpdate(
-      studentId,
-      { $set: updates },
-      { new: true, runValidators: true }
-    ).select("-password -refreshToken"); // hide sensitive data
-
-    res.status(200).json({
-      success: true,
-      message: "Profile updated successfully",
-      data: updatedStudent,
-    });
-  } catch (err) {
-    console.error("Update Profile Error:", err);
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
+  if (image?.path) {
+    updates.image = image.path;
   }
+
+  const updatedStudent = await Student.findByIdAndUpdate(
+    studentId,
+    { $set: updates },
+    { new: true, runValidators: true }
+  ).select("-password -refreshToken"); // hide sensitive data
+
+  res.status(200).json({
+    success: true,
+    message: "Profile updated successfully",
+    data: updatedStudent,
+  });
 });
 
 exports.getProfile = catchAsync(async (req, res) => {

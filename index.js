@@ -6,6 +6,7 @@ const connectDB = require("./config/connectDB");
 const { submitFeedback } = require("./controllers/feedbackController");
 const studentAuthRoutes = require("./routes/studentAuthRoutes");
 const studentMainRoutes = require("./routes/studentMainRoutes");
+const jobRoutes = require("./routes/jobRoutes");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -75,6 +76,7 @@ app.get("/", (req, res) => {
 app.use("/api/feedBack", submitFeedback);
 app.use("/api/student/auth", studentAuthRoutes);
 app.use("/api/student/main", studentMainRoutes);
+app.use("/api/admin/jobs", jobRoutes);
 
 const PORT = process.env.PORT || 4001;
 app.listen(PORT, () => {

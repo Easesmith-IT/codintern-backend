@@ -11,8 +11,7 @@ const router = express.Router();
 router.patch("/change-password", protect, changePassword);
 
 // TODO:
-// 1. login with google and facebook
-// 2. forget password
+// 1. forget password
 
 router.patch("/update-profile", upload.single("image"), updateProfile);
 router.get("/get-profile", getProfile);

@@ -1,7 +1,12 @@
 const mongoose = require("mongoose");
+const Counter = require("./Counter");
 
 const JobSchema = new mongoose.Schema(
   {
+    customId: {
+      type: String,
+      unique: true,
+    },
     jobImage: {
       type: String, // you can store file path or URL
       required: true,
@@ -41,6 +46,10 @@ const JobSchema = new mongoose.Schema(
         message: "At least one education value is required",
       },
     },
+    company: {
+      type: String,
+      required: true,
+    },
     aboutCompany: {
       type: String,
       required: true,
@@ -60,6 +69,19 @@ const JobSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+JobSchema.pre("save", async function (next) {
+  if (this.isNew) {
+    const counter = await Counter.findOneAndUpdate(
+      { name: "Job" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+
+    this.customId = `JOB${counter.seq.toString().padStart(4, "0")}`;
+  }
+  next();
+});
 
 const Job = mongoose.model("Job", JobSchema);
 module.exports = Job;

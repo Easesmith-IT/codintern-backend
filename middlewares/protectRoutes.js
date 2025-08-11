@@ -1,4 +1,4 @@
-const Student = require("../models/student/studentModel");
+const Student = require("../models/studentModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { generateAccessToken } = require("../utils/token");

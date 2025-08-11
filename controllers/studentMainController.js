@@ -1,4 +1,4 @@
-const Student = require("../models/student/studentModel");
+const Student = require("../models/studentModel");
 const catchAsync = require("../utils/catchAsync");
 const bcrypt = require("bcrypt");
 

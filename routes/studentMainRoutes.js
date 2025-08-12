@@ -13,7 +13,7 @@ router.patch("/change-password", protect, changePassword);
 // TODO:
 // 1. forget password
 
-router.patch("/update-profile", upload.single("image"), updateProfile);
-router.get("/get-profile", getProfile);
+router.patch("/update-profile", protect, upload.single("image"), updateProfile);
+router.get("/get-profile", protect, getProfile);
 
 module.exports = router;

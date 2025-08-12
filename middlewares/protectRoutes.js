@@ -1,3 +1,4 @@
+const { Admin } = require("../models/admin");
 const Student = require("../models/studentModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
@@ -22,8 +23,13 @@ exports.protect = catchAsync(async (req, res, next) => {
       const decoded = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET);
       console.log("Access token decoded:", decoded);
 
+      let user;
       // Find user based on role
-      let user = await Student.findById(decoded.id);
+      if (decoded.role === "subAdmin" || decoded.role === "superAdmin") {
+        user = await Admin.findById(decoded.id);
+      } else {
+        user = await Student.findById(decoded.id);
+      }
 
       if (user) {
         res.cookie("isAuthenticated", true, {
@@ -34,6 +40,7 @@ exports.protect = catchAsync(async (req, res, next) => {
           maxAge: 90 * 24 * 60 * 60 * 1000,
         });
         req.user = user;
+        req.role = decoded.role;
         return next();
       }
     } catch (error) {
@@ -48,7 +55,13 @@ exports.protect = catchAsync(async (req, res, next) => {
       const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
       console.log("Refresh token decoded:", decoded);
 
-      let user = await Student.findById(decoded.id);
+      let user;
+      // Find user based on role
+      if (decoded.role === "subAdmin" || decoded.role === "superAdmin") {
+        user = await Admin.findById(decoded.id);
+      } else {
+        user = await Student.findById(decoded.id);
+      }
 
       console.log("User found:", user);
       console.log(
@@ -70,6 +83,7 @@ exports.protect = catchAsync(async (req, res, next) => {
         id: user?._id,
         customId: user?.customId,
         tokenVersion: user?.tokenVersion,
+        role: decoded.role,
       });
 
       // Set new access token cookie
@@ -94,6 +108,7 @@ exports.protect = catchAsync(async (req, res, next) => {
       res.setHeader("X-Token-Refreshed", "true");
 
       req.user = user;
+      req.role = decoded.role;
       return next();
     } catch (error) {
       console.log("Refresh token verification failed:", error.message);

@@ -2,6 +2,7 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const Job = require("../models/jobModel");
 const mongoose = require("mongoose");
+const { uploadImage } = require("../utils/fileUploadToAzure");
 
 exports.createJob = catchAsync(async (req, res, next) => {
   const {
@@ -54,8 +55,18 @@ exports.createJob = catchAsync(async (req, res, next) => {
     return next(new AppError("A job with these details already exists", 400));
   }
 
+  let imageUrl;
+  if (image) {
+    try {
+      imageUrl = await uploadImage(image);
+    } catch (error) {
+      console.error("Error uploading job image:", error);
+      return next(new AppError("Failed to upload job image", 500));
+    }
+  }
+
   const newJob = new Job({
-    jobImage: image.path,
+    jobImage: imageUrl,
     title,
     postingDate,
     status,
@@ -89,15 +100,22 @@ exports.updateJob = catchAsync(async (req, res, next) => {
   //   return next(new AppError("Use the /status endpoint to update status", 400));
   // }
 
-  console.log("image", image);
-  
+   let imageUrl;
+   if (image) {
+     try {
+       imageUrl = await uploadImage(image);
+     } catch (error) {
+       console.error("Error uploading job image:", error);
+       return next(new AppError("Failed to upload job image", 500));
+     }
+   }
 
   const updatedJob = await Job.findByIdAndUpdate(
     id,
     {
       ...jobData,
       education: JSON.parse(jobData?.education),
-      ...(image?.path && {jobImage: image?.path || ""})
+      ...(imageUrl && { jobImage: imageUrl }),
     },
     {
       new: true,
@@ -180,7 +198,7 @@ exports.getJobs = catchAsync(async (req, res, next) => {
     success: true,
     pagination: {
       totalPages: Math.ceil(totalJobs / limit),
-      currentPage: page,
+      page,
       limit,
       totalJobs,
     },
@@ -234,7 +252,7 @@ exports.deleteJob = catchAsync(async (req, res, next) => {
 
   // 5️⃣ Return success response
   res.status(200).json({
-    status: "success",
+    success: true,
     message: "Job deleted successfully",
     job: deletedJob,
   });

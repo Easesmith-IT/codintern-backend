@@ -151,6 +151,12 @@ exports.login = catchAsync(async (req, res) => {
     return res.status(401).json({ message: "Invalid email" });
   }
 
+  if (student.authProvider !== "local") {
+    return res.status(400).json({
+      message: `Please log in using ${student.authProvider}`,
+    });
+  }
+
   // 3. Compare password
   const isMatch = await bcrypt.compare(password, student.password);
   if (!isMatch) {
@@ -188,6 +194,7 @@ exports.login = catchAsync(async (req, res) => {
 
   // 5. Send response
   res.status(200).json({
+    success: true,
     message: "Login successful",
     isAuthenticated: true,
     cookies: {
@@ -334,8 +341,8 @@ exports.signup2 = catchAsync(async (req, res) => {
     educationLevel = "",
   } = req.body;
 
-  console.log("req.body",req.body);
-  
+  console.log("req.body", req.body);
+
   // 1. Basic validation – check all required fields
   // const hasAtLeastOneInterest =
   //   (Array.isArray(tech) && tech.length > 0) ||

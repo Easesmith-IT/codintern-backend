@@ -1,6 +1,7 @@
 const Student = require("../models/studentModel");
 const catchAsync = require("../utils/catchAsync");
 const bcrypt = require("bcrypt");
+const { uploadImage } = require("../utils/fileUploadToAzure");
 
 exports.changePassword = catchAsync(async (req, res) => {
   console.log("req.user", req.user);
@@ -28,7 +29,9 @@ exports.changePassword = catchAsync(async (req, res) => {
   student.password = hashedNewPassword;
   await student.save();
 
-  res.status(200).json({ message: "Password changed successfully" });
+  res
+    .status(200)
+    .json({ success: true, message: "Password changed successfully" });
 });
 
 exports.updateProfile = catchAsync(async (req, res) => {
@@ -56,8 +59,18 @@ exports.updateProfile = catchAsync(async (req, res) => {
   if (profileVisibility !== undefined)
     updates.profileVisibility = profileVisibility;
 
-  if (image?.path) {
-    updates.image = image.path;
+  let imageUrl;
+  if (image) {
+    try {
+      imageUrl = await uploadImage(image);
+    } catch (error) {
+      console.error("Error uploading student image:", error);
+      return next(new AppError("Failed to upload student image", 500));
+    }
+  }
+
+  if (imageUrl) {
+    updates.image = imageUrl;
   }
 
   const updatedStudent = await Student.findByIdAndUpdate(

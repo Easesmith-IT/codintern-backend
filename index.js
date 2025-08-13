@@ -15,8 +15,10 @@ const session = require("express-session");
 
 const studentAuthRoutes = require("./routes/studentAuthRoutes");
 const studentMainRoutes = require("./routes/studentMainRoutes");
+const studentJobRoutes = require("./routes/studentJobRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+
 const { submitFeedback } = require("./controllers/feedbackController");
 const globalErrorHandler = require("./controllers/errorController");
 
@@ -56,9 +58,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://cod-intern-frontend.vercel.app",
-      "https://www.codintern.com",
-      "https://cod-intern-admin-panel.vercel.app",
+      process.env.FRONT_END_URL,
       process.env.ADMIN_FRONT_END_URL,
     ],
     credentials: true,
@@ -74,8 +74,11 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/feedBack", submitFeedback);
+
 app.use("/api/student/auth", studentAuthRoutes);
 app.use("/api/student/main", studentMainRoutes);
+app.use("/api/student/jobs", studentJobRoutes);
+
 app.use("/api/admin/jobs", jobRoutes);
 app.use("/api/admin/admins", adminRoutes);
 

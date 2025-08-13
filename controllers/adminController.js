@@ -87,7 +87,7 @@ exports.createAdmin = catchAsync(async (req, res, next) => {
     role: "subAdmin",
     // role: "superAdmin",
     permissions: validatedPermissions,
-    // createdBy: req.admin._id,
+    createdBy: req.user._id,
     status: "active",
   });
 
@@ -180,7 +180,8 @@ exports.getAdmins = catchAsync(async (req, res) => {
     status,
     search,
     sortField = "createdAt",
-    sortOrder = "desc",
+    // sortOrder = "desc",
+    sortOrder = "asc",
   } = req.query;
 
   const query = {};

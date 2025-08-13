@@ -16,8 +16,8 @@ const router = express.Router();
 
 router.post(
   "/create",
-    protect,
-    authorize("admin", "read&write"),
+  protect,
+  authorize("admin", "read&write"),
   upload.single("image"),
   createAdmin
 );
@@ -55,6 +55,6 @@ router.patch(
   protect,
   authorize("admin", "read&write"),
   changePassword
-);
+); // TODO: Integrate
 
 module.exports = router;

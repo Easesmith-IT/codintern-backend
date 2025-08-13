@@ -1,0 +1,73 @@
+const Job = require("../models/jobModel");
+const AppError = require("../utils/appError");
+const catchAsync = require("../utils/catchAsync");
+
+exports.getJobs = catchAsync(async (req, res, next) => {
+  let { page = 1, limit = 10, status, category, search } = req.query;
+  page = parseInt(page);
+  limit = parseInt(limit);
+
+  const skip = (page - 1) * limit;
+
+  // Build query object
+  let query = {};
+
+  if (status && ["active", "inactive"].includes(status.toLowerCase())) {
+    query.status = status.toLowerCase();
+  }
+
+  if (category) {
+    query.category = category;
+  }
+
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { aboutCompany: { $regex: search, $options: "i" } },
+      { company: { $regex: search, $options: "i" } },
+      { city: { $regex: search, $options: "i" } },
+      { state: { $regex: search, $options: "i" } },
+      { country: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  const totalJobs = await Job.countDocuments(query);
+  const jobs = await Job.find(query)
+    .sort({ createdAt: -1 }) // latest first
+    .skip(skip)
+    .limit(limit);
+
+  res.json({
+    success: true,
+    pagination: {
+      totalPages: Math.ceil(totalJobs / limit),
+      page,
+      limit,
+      totalJobs,
+    },
+    jobs,
+  });
+});
+
+exports.getJobDetails = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  let job;
+
+  // Check if it's MongoDB ObjectId
+  if (id.match(/^[0-9a-fA-F]{24}$/)) {
+    job = await Job.findById(id);
+  } else {
+    // Else search by customId
+    job = await Job.findOne({ customId: id });
+  }
+
+  if (!job) {
+    return next(new AppError("Job not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    job,
+  });
+});

@@ -3,11 +3,17 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 
 exports.getJobs = catchAsync(async (req, res, next) => {
-  let { page = 1, limit = 10, status, category, search } = req.query;
+  let {
+    page = 1,
+    limit = 10,
+    status,
+    category,
+    search,
+    getAll = false,
+  } = req.query;
   page = parseInt(page);
   limit = parseInt(limit);
-
-  const skip = (page - 1) * limit;
+  getAll = getAll === "true" || getAll === true; // ensure boolean
 
   // Build query object
   let query = {};
@@ -32,22 +38,32 @@ exports.getJobs = catchAsync(async (req, res, next) => {
   }
 
   const totalJobs = await Job.countDocuments(query);
-  const jobs = await Job.find(query)
-    .sort({ createdAt: -1 }) // latest first
-    .skip(skip)
-    .limit(limit);
+
+  let jobsQuery = Job.find(query).sort({ createdAt: -1 }); // latest first
+
+  if (!getAll) {
+    const skip = (page - 1) * limit;
+    jobsQuery = jobsQuery.skip(skip).limit(limit);
+  }
+
+  const jobs = await jobsQuery;
 
   res.json({
     success: true,
-    pagination: {
-      totalPages: Math.ceil(totalJobs / limit),
-      page,
-      limit,
-      totalJobs,
-    },
+    ...(getAll
+      ? {}
+      : {
+          pagination: {
+            totalPages: Math.ceil(totalJobs / limit),
+            page,
+            limit,
+            totalJobs,
+          },
+        }),
     jobs,
   });
 });
+
 
 exports.getJobDetails = catchAsync(async (req, res, next) => {
   const { id } = req.params;

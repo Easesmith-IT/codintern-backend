@@ -28,33 +28,36 @@ const adminActivitySchema = new mongoose.Schema(
 );
 
 // Schema for admin permissions
-const permissionSchema = new mongoose.Schema({
-  dashboard: {
-    type: String,
-    enum: ["none", "read", "read&write"],
-    default: "none",
+const permissionSchema = new mongoose.Schema(
+  {
+    dashboard: {
+      type: String,
+      enum: ["none", "read", "read&write"],
+      default: "none",
+    },
+    admin: {
+      type: String,
+      enum: ["none", "read", "read&write"],
+      default: "none",
+    },
+    job: {
+      type: String,
+      enum: ["none", "read", "read&write"],
+      default: "none",
+    },
+    student: {
+      type: String,
+      enum: ["none", "read", "read&write"],
+      default: "none",
+    },
+    review: {
+      type: String,
+      enum: ["none", "read", "read&write"],
+      default: "none",
+    },
   },
-  admin: {
-    type: String,
-    enum: ["none", "read", "read&write"],
-    default: "none",
-  },
-  job: {
-    type: String,
-    enum: ["none", "read", "read&write"],
-    default: "none",
-  },
-  student: {
-    type: String,
-    enum: ["none", "read", "read&write"],
-    default: "none",
-  },
-  review: {
-    type: String,
-    enum: ["none", "read", "read&write"],
-    default: "none",
-  },
-});
+  { _id: false }
+);
 
 // Main admin schema
 const adminSchema = new mongoose.Schema(

@@ -113,6 +113,10 @@ exports.loginAdmin = catchAsync(async (req, res, next) => {
     return next(new AppError("Admin doesn't exist", 400));
   }
 
+  if (foundAdmin.status !== "active") {
+    return next(new AppError("Admin is not active", 400));
+  }
+
   console.log("foundAdmin", foundAdmin);
   const matchedPassword = await bcrypt.compare(password, foundAdmin.password);
   if (!matchedPassword) {
@@ -238,7 +242,9 @@ exports.getAdminDetails = catchAsync(async (req, res) => {
   }
 
   const admin = await Admin.findById(id)
-    .select("-password -refreshToken -passwordResetToken -passwordResetExpires")
+    .select(
+      "-password -refreshToken -passwordResetToken -passwordResetExpires -permissions._id"
+    )
     .populate("createdBy", "name email role");
 
   if (!admin) {
@@ -408,8 +414,9 @@ exports.deleteAdmin = catchAsync(async (req, res, next) => {
 });
 
 exports.changePassword = catchAsync(async (req, res, next) => {
-  const { _id: adminId } = req.user; // or from req.body or JWT token
-  const { oldPassword, newPassword } = req.body;
+  const { oldPassword, newPassword, adminId } = req.body;
+
+  console.log("req.body", req.body);
 
   if (!oldPassword || !newPassword) {
     return next(new AppError("Both old and new passwords are required", 400));
@@ -419,6 +426,7 @@ exports.changePassword = catchAsync(async (req, res, next) => {
   if (!admin) {
     return next(new AppError("Admin not found", 404));
   }
+  console.log("admin", admin);
 
   const isMatch = await bcrypt.compare(oldPassword, admin.password);
   if (!isMatch) {

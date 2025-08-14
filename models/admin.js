@@ -222,16 +222,16 @@ adminSchema.pre("save", function (next) {
 });
 
 // Automatically grant all permissions to superAdmin
-adminSchema.pre("save", function (next) {
-  if (this.role === "superAdmin") {
-    const allModules = ["dashboard", "admin", "job", "student", "review"];
+// adminSchema.pre("save", function (next) {
+//   if (this.role === "superAdmin") {
+//     const allModules = ["dashboard", "admin", "job", "student", "review"];
 
-    allModules.forEach((module) => {
-      this.permissions[module] = "read&write";
-    });
-  }
-  next();
-});
+//     allModules.forEach((module) => {
+//       this.permissions[module] = "read&write";
+//     });
+//   }
+//   next();
+// });
 
 const Admin = mongoose.model("Admin", adminSchema);
 const AdminActivity = mongoose.model("AdminActivity", adminActivitySchema);

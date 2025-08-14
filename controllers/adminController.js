@@ -127,31 +127,35 @@ exports.loginAdmin = catchAsync(async (req, res, next) => {
     customId: foundAdmin.customId,
     role: foundAdmin.role,
     tokenVersion: foundAdmin.tokenVersion,
+    // permissions: foundAdmin.permissions,
   });
   const accessToken = await generateAccessToken({
     id: foundAdmin._id,
     customId: foundAdmin.customId,
     role: foundAdmin.role,
     tokenVersion: foundAdmin.tokenVersion,
+    // permissions: foundAdmin.permissions,
   });
-
+  
   foundAdmin.refreshToken = refreshToken;
   await foundAdmin.save();
-
+  
   const userInfo = {
     id: foundAdmin._id,
     customId: foundAdmin.customId,
     name: foundAdmin.name,
     email: foundAdmin.email,
     image: foundAdmin.profileImage,
+    permissions: foundAdmin.permissions,
   };
-
-  setTokenCookies({
-    res,
-    accessToken,
-    refreshToken,
-    userInfo,
-  });
+  
+  // setTokenCookies({
+    //   res,
+    //   accessToken,
+    //   refreshToken,
+    //   userInfo,
+    // });
+    console.log("userInfo", userInfo);
 
   res.status(200).json({
     success: true,
@@ -162,7 +166,6 @@ exports.loginAdmin = catchAsync(async (req, res, next) => {
       refreshToken,
       userInfo,
     },
-    accessToken,
     admin: {
       id: foundAdmin?._id,
       name: foundAdmin?.name,

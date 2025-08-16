@@ -9,6 +9,6 @@ const router = express.Router();
 
 router.get("/get", getJobs);
 router.get("/get-details/:id", getJobDetails);
-router.post("/apply-job", protect, applyJob);
+router.post("/apply-job", applyJob);
 
 module.exports = router;

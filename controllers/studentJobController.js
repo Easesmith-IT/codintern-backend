@@ -96,6 +96,7 @@ exports.applyJob = catchAsync(async (req, res, next) => {
     email,
     phoneNumber,
     jobId,
+    userId,
     resumeUrl,
     coverLetter,
   } = req.body;
@@ -134,7 +135,7 @@ exports.applyJob = catchAsync(async (req, res, next) => {
     email,
     phoneNumber,
     jobId,
-    userId: req.user._id,
+    userId: req?.user?._id || userId,
     resumeUrl,
     coverLetter,
   });

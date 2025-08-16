@@ -1,3 +1,4 @@
+const JobApplication = require("../models/jobApplication");
 const Job = require("../models/jobModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
@@ -64,7 +65,6 @@ exports.getJobs = catchAsync(async (req, res, next) => {
   });
 });
 
-
 exports.getJobDetails = catchAsync(async (req, res, next) => {
   const { id } = req.params;
 
@@ -85,5 +85,64 @@ exports.getJobDetails = catchAsync(async (req, res, next) => {
   res.status(200).json({
     success: true,
     job,
+  });
+});
+
+exports.applyJob = catchAsync(async (req, res, next) => {
+  const {
+    fullName,
+    dateOfBirth,
+    gender,
+    email,
+    phoneNumber,
+    jobId,
+    resumeUrl,
+    coverLetter,
+  } = req.body;
+
+  console.log("req.body", req.body);
+
+  // Validate required fields
+  if (
+    !fullName ||
+    !dateOfBirth ||
+    !gender ||
+    !email ||
+    !phoneNumber ||
+    !jobId
+  ) {
+    return next(new AppError("Missing required fields", 400));
+  }
+
+  // Check if job exists
+  const job = await Job.findById(jobId);
+  if (!job) {
+    return next(new AppError("Job not found", 404));
+  }
+
+  // Prevent duplicate applications by same user for same job
+  const existingApplication = await JobApplication.findOne({ jobId, email });
+  if (existingApplication) {
+    return next(new AppError("You have already applied for this job", 400));
+  }
+
+  // Create job application
+  const application = new JobApplication({
+    fullName,
+    dateOfBirth,
+    gender,
+    email,
+    phoneNumber,
+    jobId,
+    userId: req.user._id,
+    resumeUrl,
+    coverLetter,
+  });
+
+  await application.save();
+
+  res.status(201).json({
+    message: "Job application submitted successfully",
+    application,
   });
 });

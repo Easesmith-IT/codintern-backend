@@ -8,6 +8,7 @@ const {
   updateAdminStatus,
   deleteAdmin,
   changePassword,
+  logout,
 } = require("../controllers/adminController");
 const upload = require("../middlewares/imgUpload");
 const { protect } = require("../middlewares/protectRoutes");
@@ -55,6 +56,7 @@ router.patch(
   protect,
   authorize("admin", "read&write"),
   changePassword
-); // TODO: Integrate
+);
+router.post("/logout", protect, logout);
 
 module.exports = router;

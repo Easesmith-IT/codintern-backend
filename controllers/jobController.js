@@ -19,6 +19,8 @@ exports.createJob = catchAsync(async (req, res, next) => {
     rolesAndReponsibilities,
     goodToHave,
     company,
+    externalLink,
+    jobId,
   } = req.body;
 
   const image = req?.file;
@@ -49,6 +51,7 @@ exports.createJob = catchAsync(async (req, res, next) => {
     city: city.trim(),
     state: state.trim(),
     country: country.trim(),
+    jobId: jobId.trim(),
   });
 
   if (existingJob) {
@@ -80,6 +83,8 @@ exports.createJob = catchAsync(async (req, res, next) => {
     aboutJob,
     rolesAndReponsibilities,
     goodToHave,
+    externalLink,
+    jobId,
   });
 
   const savedJob = await newJob.save();
@@ -100,15 +105,15 @@ exports.updateJob = catchAsync(async (req, res, next) => {
   //   return next(new AppError("Use the /status endpoint to update status", 400));
   // }
 
-   let imageUrl;
-   if (image) {
-     try {
-       imageUrl = await uploadImage(image);
-     } catch (error) {
-       console.error("Error uploading job image:", error);
-       return next(new AppError("Failed to upload job image", 500));
-     }
-   }
+  let imageUrl;
+  if (image) {
+    try {
+      imageUrl = await uploadImage(image);
+    } catch (error) {
+      console.error("Error uploading job image:", error);
+      return next(new AppError("Failed to upload job image", 500));
+    }
+  }
 
   const updatedJob = await Job.findByIdAndUpdate(
     id,

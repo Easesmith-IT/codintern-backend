@@ -291,10 +291,7 @@ exports.logout = catchAsync(async (req, res, next) => {
 
   // If user doesn't exist, return an error
   if (!student) {
-    return res.status(404).json({
-      success: false,
-      message: "Student not found",
-    });
+    return next(new AppError("Student not found", 404));
   }
 
   // Reset token version to invalidate all refresh tokens

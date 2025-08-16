@@ -75,10 +75,12 @@ app.get("/", (req, res) => {
 
 app.use("/api/feedBack", submitFeedback);
 
+// student routes
 app.use("/api/student/auth", studentAuthRoutes);
 app.use("/api/student/main", studentMainRoutes);
 app.use("/api/student/jobs", studentJobRoutes);
 
+// admin routes
 app.use("/api/admin/jobs", jobRoutes);
 app.use("/api/admin/admins", adminRoutes);
 

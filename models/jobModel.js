@@ -66,6 +66,12 @@ const JobSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    externalLink: {
+      type: String,
+    },
+    jobId: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

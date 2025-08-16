@@ -136,10 +136,10 @@ exports.loginAdmin = catchAsync(async (req, res, next) => {
     tokenVersion: foundAdmin.tokenVersion,
     // permissions: foundAdmin.permissions,
   });
-  
+
   foundAdmin.refreshToken = refreshToken;
   await foundAdmin.save();
-  
+
   const userInfo = {
     id: foundAdmin._id,
     customId: foundAdmin.customId,
@@ -148,14 +148,14 @@ exports.loginAdmin = catchAsync(async (req, res, next) => {
     image: foundAdmin.profileImage,
     permissions: foundAdmin.permissions,
   };
-  
+
   // setTokenCookies({
-    //   res,
-    //   accessToken,
-    //   refreshToken,
-    //   userInfo,
-    // });
-    console.log("userInfo", userInfo);
+  //   res,
+  //   accessToken,
+  //   refreshToken,
+  //   userInfo,
+  // });
+  console.log("userInfo", userInfo);
 
   res.status(200).json({
     success: true,
@@ -442,4 +442,33 @@ exports.changePassword = catchAsync(async (req, res, next) => {
   res
     .status(200)
     .json({ success: true, message: "Password changed successfully" });
+});
+
+exports.logout = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+
+  const admin = await Admin.findOne({ email });
+
+  // If admin doesn't exist, return an error
+  if (!admin) {
+    return next(new AppError("Admin not found", 404));
+  }
+
+  // Reset token version to invalidate all refresh tokens
+  admin.tokenVersion = (admin.tokenVersion || 0) + 1; // Increment instead of reset to 0
+  await admin.save();
+
+  // Clear cookies
+  setTokenCookies({
+    res,
+    accessToken: "",
+    refreshToken: "",
+    accessTokenMaxAge: 0,
+    refreshTokenMaxAge: 0,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
 });

@@ -39,10 +39,10 @@ const jobApplicationSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Job",
     },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Student",
-    },
+    // userId: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Student",
+    // },
     resumeUrl: {
       type: String,
     },

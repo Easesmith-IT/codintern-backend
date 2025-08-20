@@ -77,7 +77,6 @@ const jobApplicationSchema = new mongoose.Schema(
       enum: ["pending", "reviewed", "shortlisted", "rejected", "accepted"],
       default: "pending",
     },
-    statusHistory: [statusHistorySchema],
     appliedAt: {
       type: Date,
       default: Date.now,

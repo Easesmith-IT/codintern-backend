@@ -4,13 +4,20 @@ const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}.`;
   return new AppError(message, 400);
 };
+// const handleDuplicateFieldsDB = (err) => {
+//   // const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
+//   console.log("handleDuplicateFieldsDB error",err);
+//   const field = Object.keys(err.keyValue)[0];
+//   const value = err.keyValue[field];
+//   console.log(value);
+//   const message = `Duplicate field value for ${field}: ${value}. Please use another value!`;
+//   return new AppError(message, 400);
+// };
+
 const handleDuplicateFieldsDB = (err) => {
-  // const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
-  console.log("handleDuplicateFieldsDB error",err);
   const field = Object.keys(err.keyValue)[0];
   const value = err.keyValue[field];
-  console.log(value);
-  const message = `Duplicate field value: ${value}. Please use another value!`;
+  const message = `${field} '${value}' is already registered. Please use another value!`;
   return new AppError(message, 400);
 };
 
@@ -54,7 +61,7 @@ const sendErrorProd = (err, res) => {
 };
 module.exports = (err, req, res, next) => {
   // console.log(err.stack);
-  // console.log('err catched',err)
+  console.log('err catched',err)
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
   console.log('env',process.env.NODE_ENV);
@@ -63,7 +70,7 @@ module.exports = (err, req, res, next) => {
   }
   
   else if (process.env.NODE_ENV === "production") {
-    let error = { ...err };
+    let error = err;
     error.message = err.message;
     if (error.name === "CastError") error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);

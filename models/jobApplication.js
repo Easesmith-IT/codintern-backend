@@ -1,6 +1,29 @@
 const mongoose = require("mongoose");
 const Counter = require("./Counter");
 
+const statusHistorySchema = new mongoose.Schema(
+  {
+    status: {
+      type: String,
+      enum: ["pending", "reviewed", "shortlisted", "rejected", "accepted"],
+      required: true,
+    },
+    changedAt: {
+      type: Date,
+      default: Date.now,
+    },
+    changedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin", // HR/Admin who changed status
+    },
+    note: {
+      type: String, // optional comments (e.g. "Interview scheduled")
+      trim: true,
+    },
+  },
+  { _id: false } // don’t create a separate _id for each entry
+);
+
 const jobApplicationSchema = new mongoose.Schema(
   {
     customId: {
@@ -54,6 +77,7 @@ const jobApplicationSchema = new mongoose.Schema(
       enum: ["pending", "reviewed", "shortlisted", "rejected", "accepted"],
       default: "pending",
     },
+    statusHistory: [statusHistorySchema],
     appliedAt: {
       type: Date,
       default: Date.now,

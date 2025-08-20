@@ -3,6 +3,7 @@ const catchAsync = require("../utils/catchAsync");
 const Job = require("../models/jobModel");
 const mongoose = require("mongoose");
 const { uploadImage } = require("../utils/fileUploadToAzure");
+const JobApplication = require("../models/jobApplication");
 
 exports.createJob = catchAsync(async (req, res, next) => {
   const {
@@ -194,10 +195,30 @@ exports.getJobs = catchAsync(async (req, res, next) => {
   }
 
   const totalJobs = await Job.countDocuments(query);
-  const jobs = await Job.find(query)
-    .sort({ createdAt: -1 }) // latest first
-    .skip(skip)
-    .limit(limit);
+  const jobs = await Job.aggregate([
+    { $match: query },
+    { $sort: { createdAt: -1 } },
+    { $skip: skip },
+    { $limit: limit },
+    {
+      $lookup: {
+        from: "jobapplications", // collection name (check in MongoDB, usually lowercase + plural)
+        localField: "_id",
+        foreignField: "jobId",
+        as: "applications",
+      },
+    },
+    {
+      $addFields: {
+        applicationCount: { $size: "$applications" },
+      },
+    },
+    {
+      $project: {
+        applications: 0, // hide actual applications array
+      },
+    },
+  ]);
 
   res.json({
     success: true,
@@ -260,5 +281,119 @@ exports.deleteJob = catchAsync(async (req, res, next) => {
     success: true,
     message: "Job deleted successfully",
     job: deletedJob,
+  });
+});
+
+exports.getJobApplications = catchAsync(async (req, res, next) => {
+  const { id } = req.params; // jobId
+  let { page = 1, limit = 10, status, search } = req.query;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
+  const skip = (page - 1) * limit;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: "Job ID is required",
+    });
+  }
+
+  // build query
+  let query = { jobId: id };
+
+  if (
+    status &&
+    ["pending", "reviewed", "shortlisted", "rejected", "accepted"].includes(
+      status.toLowerCase()
+    )
+  ) {
+    query.status = status.toLowerCase();
+  }
+
+  if (search) {
+    query.$or = [
+      { fullName: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
+      { phoneNumber: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  // get counts
+  const totalApplications = await JobApplication.countDocuments(query);
+
+  // get applications with pagination
+  const applications = await JobApplication.find(query)
+    .populate("jobId", "title company category postingDate")
+    .sort({ appliedAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  res.json({
+    success: true,
+    pagination: {
+      totalPages: Math.ceil(totalApplications / limit),
+      page,
+      limit,
+      totalApplications,
+    },
+    applications,
+  });
+});
+
+exports.updateJobApplicationStatus = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { status, note } = req.body;
+
+  // Ensure status is valid
+  const allowedStatuses = [
+    "pending",
+    "reviewed",
+    "shortlisted",
+    "rejected",
+    "accepted",
+  ];
+  if (!allowedStatuses.includes(status)) {
+    return next(new AppError("Invalid status", 400));
+  }
+
+  const application = await JobApplication.findById(id);
+  if (!application) {
+    return next(new AppError("Job application not found", 404));
+  }
+
+  // Update status
+  application.status = status;
+
+  // Push history entry
+  application.statusHistory.push({
+    status,
+    changedBy: req.user?._id, // assumes you set req.user in auth middleware
+    note,
+  });
+
+  await application.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Status updated successfully",
+    data: application,
+  });
+});
+
+exports.getJobApplicationDetails = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const application = await JobApplication.findById(id)
+    .populate("jobId", "title company") // get job title + company name
+    .populate("statusHistory.changedBy", "name email"); // who updated status
+
+  if (!application) {
+    return next(new AppError("Job application not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: application,
   });
 });

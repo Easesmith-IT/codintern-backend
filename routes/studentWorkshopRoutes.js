@@ -7,4 +7,3 @@ const router = express.Router();
 router.post("/register", registerWorkshop);
 
 module.exports = router;
-

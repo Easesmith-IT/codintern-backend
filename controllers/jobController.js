@@ -293,10 +293,7 @@ exports.getJobApplications = catchAsync(async (req, res, next) => {
   const skip = (page - 1) * limit;
 
   if (!id) {
-    return res.status(400).json({
-      success: false,
-      message: "Job ID is required",
-    });
+    return next(new AppError("Job ID is required", 400));
   }
 
   // build query

@@ -146,3 +146,82 @@ exports.applyJob = catchAsync(async (req, res, next) => {
     application,
   });
 });
+
+exports.getJobApplications = catchAsync(async (req, res, next) => {
+  let { page = 1, limit = 10, search, email } = req.query;
+  page = parseInt(page);
+  limit = parseInt(limit);
+  const skip = (page - 1) * limit;
+
+  if (!email) {
+    return next(new AppError("Email is required", 400));
+  }
+
+  // Aggregation pipeline
+  const pipeline = [
+    { $match: { email } }, // ✅ filter by applicant email
+    {
+      $lookup: {
+        from: "jobs", // collection name in MongoDB
+        localField: "jobId",
+        foreignField: "_id",
+        as: "job",
+      },
+    },
+    { $unwind: "$job" },
+  ];
+
+  // ✅ search by job title OR company name
+  if (search) {
+    pipeline.push({
+      $match: {
+        $or: [
+          { "job.company": { $regex: search, $options: "i" } },
+          { "job.title": { $regex: search, $options: "i" } },
+        ],
+      },
+    });
+  }
+
+  // Count total applications
+  const countPipeline = [...pipeline, { $count: "total" }];
+  const totalResult = await JobApplication.aggregate(countPipeline);
+  const totalApplications = totalResult[0]?.total || 0;
+
+  // Paginated results
+  const applications = await JobApplication.aggregate([
+    ...pipeline,
+    { $sort: { appliedAt: -1 } },
+    { $skip: skip },
+    { $limit: limit },
+    {
+      $project: {
+        customId: 1,
+        fullName: 1,
+        email: 1,
+        phoneNumber: 1,
+        status: 1,
+        appliedAt: 1,
+        resumeUrl: 1,
+        gender: 1,
+        dateOfBirth: 1,
+        coverLetter: 1,
+        "job.title": 1, // ✅ included
+        "job.company": 1, // ✅ included
+        "job.category": 1,
+        "job.postingDate": 1,
+      },
+    },
+  ]);
+
+  res.json({
+    success: true,
+    pagination: {
+      totalPages: Math.ceil(totalApplications / limit),
+      page,
+      limit,
+      totalApplications,
+    },
+    applications,
+  });
+});

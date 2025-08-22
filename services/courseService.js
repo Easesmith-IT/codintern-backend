@@ -17,12 +17,36 @@ exports.updateCourse = async (id, update, next) => {
 };
 
 // Add module
-exports.addModule = async (courseId, moduleData, next) => {
+exports.addModules = async (courseId, modulesData, next) => {
   const course = await Course.findById(courseId);
   if (!course) {
     throw new AppError("Course not found", 404);
   }
-  course.modules.push(moduleData);
+
+  course.modules.push(...modulesData); // spread to push multiple
+  await course.save();
+
+  return course;
+};
+
+// Additional Info (career + materials + features + venue)
+exports.updateAdditionalDetails = async (courseId, data, next) => {
+  const course = await Course.findById(courseId);
+  if (!course) {
+    throw new AppError("Course not found", 404);
+  }
+
+  if (data.instructors) course.instructors = data.instructors;
+
+  if (!course.pricing || !course.modules.length) {
+    throw new AppError("Course is missing pricing or modules", 400);
+  }
+
+  if (data.publish) {
+    course.status = "published";
+    course.publishedAt = new Date();
+  }
+
   await course.save();
   return course;
 };
@@ -40,8 +64,8 @@ exports.publishCourse = async (courseId, data, next) => {
     throw new AppError("Course is missing pricing or modules", 400);
   }
 
-  if (data.publish) {
-    course.status = "published";
+  if (data.status) {
+    course.status = data.status;
     course.publishedAt = new Date();
   }
 

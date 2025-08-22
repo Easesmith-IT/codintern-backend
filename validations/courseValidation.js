@@ -28,7 +28,7 @@ exports.updateDetailsSchema = Joi.object({
     certificateLink: Joi.string().uri().optional(),
     issueDate: Joi.date().optional(),
     expiryDate: Joi.date().optional(),
-  }).optional(),
+  }).required(),
 
   courseHighlights: Joi.array()
     .items(
@@ -43,7 +43,7 @@ exports.updateDetailsSchema = Joi.object({
         value: Joi.string().optional(),
       })
     )
-    .optional(),
+    .required(),
 
   studentBenefits: Joi.array()
     .items(
@@ -58,28 +58,34 @@ exports.updateDetailsSchema = Joi.object({
         value: Joi.string().optional(),
       })
     )
-    .optional(),
+    .required(),
 });
 
 // STEP 3: Module + lessons
-exports.addModuleSchema = Joi.object({
-  title: Joi.string().required(),
-  description: Joi.string().optional(),
-  lessons: Joi.array()
-    .items(
-      Joi.object({
-        title: Joi.string().required(),
-        contentType: Joi.string()
-          .valid("video", "article", "quiz", "assignment")
-          .required(),
-        contentUrl: Joi.string().uri().optional(),
-        duration: Joi.number().min(1).required(),
-        isPreviewFree: Joi.boolean().optional(),
-      })
-    )
-    .min(1)
-    .required(),
-});
+exports.addModulesSchema = Joi.array()
+  .items(
+    Joi.object({
+      title: Joi.string().required(),
+      description: Joi.string().required(),
+      lessons: Joi.array()
+        .items(
+          Joi.object({
+            title: Joi.string().required(),
+            contentType: Joi.string()
+              .valid("video", "article", "quiz", "assignment")
+              .required(),
+            contentUrl: Joi.string().uri().optional(),
+            duration: Joi.number().min(1).optional(),
+            isPreviewFree: Joi.boolean().optional(),
+          })
+        )
+        .min(1)
+        .required(),
+    })
+  )
+  .min(1)
+  .required();
+
 
 // STEP 4: Extras (projects + batches)
 exports.updateExtrasSchema = Joi.object({
@@ -119,8 +125,48 @@ exports.updateExtrasSchema = Joi.object({
     .optional(),
 });
 
-// STEP 5: Publish
+// STEP 5: Additional Info (career + materials + features + venue)
+exports.updateAdditionalSchema = Joi.object({
+  courseDuration: Joi.string().required(), // e.g. "3 months"
+  classTiming: Joi.string().required(), // e.g. "Weekdays 7-9 PM"
+  totalSeats: Joi.number().min(1).required(),
+
+  brochure: Joi.string().uri().required(),
+  syllabusFile: Joi.string().uri().required(),
+
+  interviews: Joi.alternatives()
+    .try(Joi.number().min(1), Joi.string().valid("unlimited"))
+    .optional(),
+
+  integratedInternship: Joi.object({
+    hasInternship: Joi.boolean().default(false),
+    count: Joi.alternatives()
+      .try(Joi.number().min(1), Joi.string().valid("unlimited"))
+      .optional(),
+  }).required(),
+
+  features: Joi.array()
+    .items(
+      Joi.object({
+        icon: Joi.string().required(),
+        title: Joi.string().required(),
+        subtitle: Joi.string().optional(),
+      })
+    )
+    .required(),
+
+  venue: Joi.string().valid("online").default("online"),
+  onlinePlatform: Joi.string().optional(),
+  meetingLink: Joi.string().uri().optional(),
+});
+
+// STEP 6: Publish
 exports.publishSchema = Joi.object({
   instructors: Joi.array().items(Joi.string()).min(1).required(),
-  publish: Joi.boolean().default(false),
+  status: Joi.string().valid("draft", "published", "archived").required(),
+});
+
+
+exports.updateStatusSchema = Joi.object({
+  status: Joi.string().valid("draft", "published", "archived").required(),
 });

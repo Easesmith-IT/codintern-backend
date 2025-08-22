@@ -11,7 +11,7 @@ const lessonSchema = new mongoose.Schema(
       required: true,
     },
     contentUrl: { type: String },
-    duration: { type: Number, required: true }, // in milliseconds
+    duration: { type: Number, }, // in milliseconds
     isPreviewFree: { type: Boolean, default: false },
   },
   { _id: true }

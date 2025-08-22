@@ -1,4 +1,5 @@
 const courseService = require("../services/courseService");
+const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { uploadImage } = require("../utils/fileUploadToAzure");
 
@@ -27,10 +28,11 @@ exports.createCourse = catchAsync(async (req, res) => {
 exports.updateCourseDetails = catchAsync(async (req, res, next) => {
   let { pricing, certificate, courseHighlights, studentBenefits } =
     req.body || {};
+
   certificate = JSON.parse(certificate);
+
   const image = req?.file;
   let imageUrl;
-  console.log("image", image);
 
   if (image) {
     try {
@@ -59,8 +61,8 @@ exports.updateCourseDetails = catchAsync(async (req, res, next) => {
 });
 
 // STEP 3: Add modules
-exports.addModule = catchAsync(async (req, res) => {
-  const course = await courseService.addModule(req.params.id, req.body);
+exports.addModules = catchAsync(async (req, res) => {
+  const course = await courseService.addModules(req.params.id, req.body);
   res
     .status(201)
     .json({ success: true, message: "Module added successfully", course });
@@ -69,10 +71,38 @@ exports.addModule = catchAsync(async (req, res) => {
 // STEP 4: Update extras (projects + batches)
 exports.updateCourseExtras = catchAsync(async (req, res) => {
   const update = {};
-  if (req.body.projects) update.projects = req.body.projects;
-  if (req.body.batches) update.batches = req.body.batches;
+
+  if (req.body.projects) {
+    let projects = JSON.parse(req.body.projects); // because form-data will stringify JSON
+
+    if (req.files && req.files.length > 0) {
+      const uploadedImages = await Promise.all(
+        req.files.map(async (file) => {
+          try {
+            const url = await uploadImage(file); // your Azure upload helper
+            return url;
+          } catch (error) {
+            console.error("Error uploading project icon:", error);
+            throw new AppError("Failed to upload project icon", 500);
+          }
+        })
+      );
+
+      projects = projects.map((project, index) => ({
+        ...project,
+        icon: uploadedImages[index] || project.icon, // fallback if not uploaded
+      }));
+    }
+
+    update.projects = projects;
+  }
+
+  if (req.body.batches) {
+    update.batches = JSON.parse(req.body.batches);
+  }
 
   const course = await courseService.updateCourse(req.params.id, update);
+
   res.status(200).json({
     success: true,
     message: "Projects and Batches added successfully",
@@ -80,7 +110,84 @@ exports.updateCourseExtras = catchAsync(async (req, res) => {
   });
 });
 
-// STEP 5: Assign instructors + publish
+// STEP 5: Additional Info (career + materials + features + venue)
+exports.updateAdditionalDetails = catchAsync(async (req, res, next) => {
+  const {
+    courseDuration,
+    classTiming,
+    totalSeats,
+    interviews,
+    integratedInternship,
+  } = req.body;
+  const { brochure, syllabusFile, featureIcons = [] } = req.files;
+
+  const update = {
+    courseDuration,
+    classTiming,
+    totalSeats,
+    interviews,
+    integratedInternship: JSON.parse(integratedInternship),
+  };
+
+  if (req.body.features) {
+    let features = JSON.parse(req.body.features); // because form-data will stringify JSON
+
+    if (featureIcons && featureIcons?.length > 0) {
+      const uploadedImages = await Promise.all(
+        featureIcons.map(async (file) => {
+          try {
+            const url = await uploadImage(file); // your Azure upload helper
+            return url;
+          } catch (error) {
+            console.error("Error uploading icon:", error);
+            throw new AppError("Failed to upload feature icons", 500);
+          }
+        })
+      );
+
+      features = features.map((feature, index) => ({
+        ...feature,
+        icon: uploadedImages[index] || feature.icon, // fallback if not uploaded
+      }));
+    }
+
+    update.features = features;
+  }
+
+  if (brochure[0]) {
+    let imageUrl;
+
+    try {
+      imageUrl = await uploadImage(brochure[0]);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return next(new AppError("Failed to upload brochure pdf", 500));
+    }
+    update.brochure = imageUrl;
+  }
+
+  if (syllabusFile[0]) {
+    let imageUrl;
+
+    try {
+      imageUrl = await uploadImage(syllabusFile[0]);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return next(new AppError("Failed to upload syllabus pdf", 500));
+    }
+    update.brochure = imageUrl;
+  }
+
+  const course = await courseService.updateCourse(req.params.id, update);
+
+  res.status(200).json({
+    success: true,
+    message: "Course info updated successfully",
+    course,
+  });
+});
+
+// STEP 6: Assign instructors + publish
 exports.publishCourse = catchAsync(async (req, res, next) => {
   const course = await courseService.publishCourse(
     req.params.id,
@@ -90,4 +197,17 @@ exports.publishCourse = catchAsync(async (req, res, next) => {
   res
     .status(200)
     .json({ success: true, message: "Course published successfully", course });
+});
+
+exports.updateCourseStatus = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const course = await courseService.updateCourse(id, { status });
+
+  res.status(200).json({
+    success: true,
+    message: `Course status updated to ${status}`,
+    course,
+  });
 });

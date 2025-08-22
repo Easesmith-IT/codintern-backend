@@ -18,7 +18,7 @@ const router = express.Router();
 router.post(
   "/create",
   // protect,
-  authorize("admin", "read&write"),
+  // authorize("admin", "read&write"),
   upload.single("image"),
   createAdmin
 );
@@ -27,39 +27,39 @@ router.post("/login", loginAdmin);
 router.get(
   "/get",
   // protect,
-  authorize("admin", "read"),
+  // authorize("admin", "read"),
   getAdmins
 );
 router.get(
   "/get-details/:id",
   // protect,
-  authorize("admin", "read"),
+  // authorize("admin", "read"),
   getAdminDetails
 );
 router.patch(
   "/update/:id",
   // protect,
-  authorize("admin", "read&write"),
+  // authorize("admin", "read&write"),
   upload.single("image"),
   updateAdmin
 );
 router.patch(
   "/update-status/:id",
   // protect,
-  authorize("admin", "read&write"),
+  // authorize("admin", "read&write"),
   updateAdminStatus
 );
 router.delete(
   "/delete/:id",
   // protect,
-  authorize("admin", "read&write"),
+  // authorize("admin", "read&write"),
   deleteAdmin
 );
 
 router.patch(
   "/change-password",
   // protect,
-  authorize("admin", "read&write"),
+  // authorize("admin", "read&write"),
   changePassword
 );
 router.post(

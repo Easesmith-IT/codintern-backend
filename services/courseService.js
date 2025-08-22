@@ -1,4 +1,4 @@
-const Course = require("../models/Course/Course");
+const Course = require("../models/course/Course");
 const AppError = require("../utils/appError");
 
 // Create draft

@@ -24,6 +24,37 @@ exports.createCourse = catchAsync(async (req, res) => {
     .json({ success: true, message: "Course created successfully", course });
 });
 
+// STEP 1: Edit basic course info
+exports.updateCourseBasicInfo = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const image = req?.file;
+  let imageUrl;
+
+  // Handle thumbnail upload if provided
+  if (image) {
+    try {
+      imageUrl = await uploadImage(image);
+    } catch (error) {
+      console.error("Error uploading thumbnail:", error);
+      return next(new AppError("Failed to upload thumbnail", 500));
+    }
+  }
+
+  // Prepare update object
+  const updateData = {
+    ...req.body,
+    ...(imageUrl && { thumbnail: imageUrl }), // Only add thumbnail if new image was uploaded
+  };
+
+  const course = await courseService.updateCourse(id, updateData);
+
+  res.status(200).json({
+    success: true,
+    message: "Course basic information updated successfully",
+    course,
+  });
+});
+
 // STEP 2: Update details (pricing + certificate + highlights)
 exports.updateCourseDetails = catchAsync(async (req, res, next) => {
   let { pricing, certificate, courseHighlights, studentBenefits } =
@@ -209,5 +240,44 @@ exports.updateCourseStatus = catchAsync(async (req, res, next) => {
     success: true,
     message: `Course status updated to ${status}`,
     course,
+  });
+});
+
+// Get all courses with filtering, pagination and search
+exports.getCourses = catchAsync(async (req, res, next) => {
+  const result = await courseService.getCourses(req.query);
+
+  res.json({
+    success: true,
+    pagination: result.pagination,
+    courses: result.courses,
+  });
+});
+
+// Get course details by ID, customId or slug
+exports.getCourseDetails = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const course = await courseService.getCourseById(id);
+
+  res.status(200).json({
+    success: true,
+    course,
+  });
+});
+
+// Delete course
+exports.deleteCourse = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  console.log("req.body", req.query);
+  
+  const { deleteType = "soft" } = req.query;
+
+  const result = await courseService.deleteCourse(id, deleteType);
+
+  res.status(200).json({
+    success: true,
+    message: result.message,
+    deleteType: result.deleteType,
+    course: result.deleteType === "soft" ? result.course : null,
   });
 });

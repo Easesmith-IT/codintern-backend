@@ -170,3 +170,8 @@ exports.publishSchema = Joi.object({
 exports.updateStatusSchema = Joi.object({
   status: Joi.string().valid("draft", "published", "archived").required(),
 });
+
+// Delete course validation
+exports.deleteCourseSchema = Joi.object({
+  deleteType: Joi.string().valid('soft', 'hard').default('soft').optional(),
+});

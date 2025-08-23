@@ -20,6 +20,7 @@ const studentWorkshopRoutes = require("./routes/studentWorkshopRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const courseRoutes = require("./routes/courseRoutes");
+const instructorRoutes = require("./routes/instructorRoutes");
 
 const { submitFeedback } = require("./controllers/feedbackController");
 const globalErrorHandler = require("./controllers/errorController");
@@ -86,7 +87,8 @@ app.use("/api/student/workshop", studentWorkshopRoutes);
 // admin routes
 app.use("/api/admin/admins", adminRoutes);
 app.use("/api/admin/jobs", jobRoutes);
-app.use("/api/admin/course", courseRoutes);
+app.use("/api/admin/courses", courseRoutes);
+app.use("/api/admin/instructors", instructorRoutes);
 
 const PORT = process.env.PORT || 4001;
 app.listen(PORT, () => {

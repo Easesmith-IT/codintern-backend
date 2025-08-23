@@ -11,7 +11,7 @@ const lessonSchema = new mongoose.Schema(
       required: true,
     },
     contentUrl: { type: String },
-    duration: { type: Number, }, // in milliseconds
+    duration: { type: Number }, // in milliseconds
     isPreviewFree: { type: Boolean, default: false },
   },
   { _id: true }
@@ -104,7 +104,7 @@ const badgeSchema = new mongoose.Schema({
     enum: ["feature", "highlight", "certification", "update"],
     default: "feature",
   },
-  image:{type:String},
+  image: { type: String },
   value: { type: String }, // optional (for extra info like "May 2025")
 });
 
@@ -192,6 +192,7 @@ const courseSchema = new mongoose.Schema(
       default: "draft",
     },
     publishedAt: { type: Date },
+    archivedAt: { type: Date },
 
     // Batches
     batches: [batchSchema],
@@ -247,15 +248,15 @@ courseSchema.virtual("savedAmount").get(function () {
 });
 
 courseSchema.pre("save", async function (next) {
-    if (this.isNew) {
-      const counter = await Counter.findOneAndUpdate(
-        { name: "Course" },
-        { $inc: { seq: 1 } },
-        { new: true, upsert: true }
-      );
-  
-      this.customId = `COURSE${counter.seq.toString().padStart(4, "0")}`;
-    }
+  if (this.isNew) {
+    const counter = await Counter.findOneAndUpdate(
+      { name: "Course" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+
+    this.customId = `COURSE${counter.seq.toString().padStart(4, "0")}`;
+  }
   this.modules.forEach((mod) => {
     mod.duration = mod.lessons.reduce((sum, l) => sum + (l.duration || 0), 0);
   });

@@ -62,29 +62,31 @@ exports.updateDetailsSchema = Joi.object({
 });
 
 // STEP 3: Module + lessons
-exports.addModulesSchema = Joi.array()
-  .items(
-    Joi.object({
-      title: Joi.string().required(),
-      description: Joi.string().required(),
-      lessons: Joi.array()
-        .items(
-          Joi.object({
-            title: Joi.string().required(),
-            contentType: Joi.string()
-              .valid("video", "article", "quiz", "assignment")
-              .required(),
-            contentUrl: Joi.string().uri().optional(),
-            duration: Joi.number().min(1).optional(),
-            isPreviewFree: Joi.boolean().optional(),
-          })
-        )
-        .min(1)
-        .required(),
-    })
-  )
-  .min(1)
-  .required();
+exports.addModulesSchema = Joi.object({
+  modules: Joi.array()
+    .items(
+      Joi.object({
+        title: Joi.string().required(),
+        description: Joi.string().required(),
+        lessons: Joi.array()
+          .items(
+            Joi.object({
+              title: Joi.string().required(),
+              contentType: Joi.string()
+                .valid("video", "article", "quiz", "assignment")
+                .required(),
+              contentUrl: Joi.string().uri().optional(),
+              duration: Joi.number().min(1).optional(),
+              isPreviewFree: Joi.boolean().optional(),
+            })
+          )
+          .min(1)
+          .required(),
+      })
+    )
+    .min(1)
+    .required(),
+});
 
 
 // STEP 4: Extras (projects + batches)

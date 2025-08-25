@@ -93,7 +93,7 @@ exports.updateCourseDetails = catchAsync(async (req, res, next) => {
 
 // STEP 3: Add modules
 exports.addModules = catchAsync(async (req, res) => {
-  const course = await courseService.addModules(req.params.id, req.body);
+  const course = await courseService.addModules(req.params.id, req.body.modules);
   res
     .status(201)
     .json({ success: true, message: "Module added successfully", course });

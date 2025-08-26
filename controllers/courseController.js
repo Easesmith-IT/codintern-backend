@@ -93,7 +93,10 @@ exports.updateCourseDetails = catchAsync(async (req, res, next) => {
 
 // STEP 3: Add modules
 exports.addModules = catchAsync(async (req, res) => {
-  const course = await courseService.addModules(req.params.id, req.body.modules);
+  const course = await courseService.addModules(
+    req.params.id,
+    req.body.modules
+  );
   res
     .status(201)
     .json({ success: true, message: "Module added successfully", course });
@@ -150,7 +153,9 @@ exports.updateAdditionalDetails = catchAsync(async (req, res, next) => {
     interviews,
     integratedInternship,
   } = req.body;
-  const { brochure, syllabusFile, featureIcons = [] } = req.files;
+  const { brochure = [], syllabusFile = [], featureIcons = [] } = req.files;
+
+  console.log("req.files", req.files);
 
   const update = {
     courseDuration,
@@ -269,7 +274,7 @@ exports.getCourseDetails = catchAsync(async (req, res, next) => {
 exports.deleteCourse = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   console.log("req.body", req.query);
-  
+
   const { deleteType = "soft" } = req.query;
 
   const result = await courseService.deleteCourse(id, deleteType);

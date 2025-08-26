@@ -23,6 +23,24 @@ router.post(
   createInstructor
 );
 
+// Get all instructors with filtering, pagination and search
+router.get("/", getInstructors);
 
+// Get instructor details by ID
+router.get("/:id", getInstructorDetails);
+
+// Update instructor
+router.put(
+  "/:id",
+  validate(updateInstructorSchema),
+  upload.single("profileImage"),
+  updateInstructor
+);
+
+// Delete instructor
+router.delete("/:id", deleteInstructor);
+
+// Toggle instructor status (active/inactive)
+router.patch("/:id/toggle-status", toggleInstructorStatus);
 
 module.exports = router;

@@ -23,7 +23,7 @@ exports.addModules = async (courseId, modulesData, next) => {
     throw new AppError("Course not found", 404);
   }
 
-  course.modules.push(...modulesData); // spread to push multiple
+  course.modules =modulesData;
   await course.save();
 
   return course;
@@ -127,7 +127,7 @@ exports.getCourses = async (queryParams) => {
 
   const totalCourses = await Course.countDocuments(query);
   const courses = await Course.find(query)
-    .populate("instructors", "name email expertise")
+    .populate("instructors", "firstName lastName email expertise")
     .select("-modules.lessons.contentUrl") // Hide content URLs for security
     .sort(sort)
     .skip(skip)

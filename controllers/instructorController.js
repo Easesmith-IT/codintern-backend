@@ -46,4 +46,96 @@ exports.createInstructor = catchAsync(async (req, res, next) => {
   });
 });
 
+// Get all instructors with filtering, pagination and search
+exports.getInstructors = catchAsync(async (req, res, next) => {
+  const result = await instructorService.getInstructors(req.query);
 
+  res.json({
+    success: true,
+    pagination: result.pagination,
+    instructors: result.instructors,
+  });
+});
+
+// Get instructor details by ID
+exports.getInstructorDetails = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const instructor = await instructorService.getInstructorById(id);
+
+  res.status(200).json({
+    success: true,
+    instructor,
+  });
+});
+
+// Update instructor
+exports.updateInstructor = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const image = req?.file;
+  let profileImageUrl;
+
+  // Upload new profile image if provided
+  if (image) {
+    try {
+      profileImageUrl = await uploadImage(image);
+    } catch (error) {
+      console.error("Error uploading profile image:", error);
+      return next(new AppError("Failed to upload profile image", 500));
+    }
+  }
+
+  const updateData = {
+    ...req.body,
+  };
+
+  // Add profile image URL if uploaded
+  if (profileImageUrl) {
+    updateData.profileImage = profileImageUrl;
+  }
+
+  // Parse arrays if they come as JSON strings
+  if (req.body.expertise) {
+    updateData.expertise = JSON.parse(req.body.expertise);
+  }
+  if (req.body.certifications) {
+    updateData.certifications = JSON.parse(req.body.certifications);
+  }
+  if (req.body.socialLinks) {
+    updateData.socialLinks = JSON.parse(req.body.socialLinks);
+  }
+  if (req.body.achievements) {
+    updateData.achievements = JSON.parse(req.body.achievements);
+  }
+
+  const instructor = await instructorService.updateInstructor(id, updateData);
+
+  res.status(200).json({
+    success: true,
+    message: "Instructor updated successfully",
+    instructor,
+  });
+});
+
+// Delete instructor
+exports.deleteInstructor = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const instructor = await instructorService.deleteInstructor(id);
+
+  res.status(200).json({
+    success: true,
+    message: "Instructor deleted successfully",
+    instructor,
+  });
+});
+
+// Toggle instructor status (active/inactive)
+exports.toggleInstructorStatus = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const instructor = await instructorService.toggleInstructorStatus(id);
+
+  res.status(200).json({
+    success: true,
+    message: `Instructor status updated to ${instructor.isActive ? 'active' : 'inactive'}`,
+    instructor,
+  });
+});

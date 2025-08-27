@@ -23,7 +23,7 @@ exports.addModules = async (courseId, modulesData, next) => {
     throw new AppError("Course not found", 404);
   }
 
-  course.modules =modulesData;
+  course.modules = modulesData;
   await course.save();
 
   return course;
@@ -153,7 +153,7 @@ exports.getCourseById = async (id) => {
   if (id.match(/^[0-9a-fA-F]{24}$/)) {
     course = await Course.findById(id).populate(
       "instructors",
-      "name email expertise bio profileImage"
+      "firstName lastName email expertise bio profileImage"
     );
   } else {
     // Else search by customId or slug

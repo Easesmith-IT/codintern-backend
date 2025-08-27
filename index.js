@@ -16,6 +16,7 @@ const session = require("express-session");
 const studentAuthRoutes = require("./routes/studentAuthRoutes");
 const studentMainRoutes = require("./routes/studentMainRoutes");
 const studentJobRoutes = require("./routes/studentJobRoutes");
+const studentCoursesRoutes = require("./routes/studentCoursesRoutes");
 const studentWorkshopRoutes = require("./routes/studentWorkshopRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const jobRoutes = require("./routes/jobRoutes");
@@ -82,6 +83,7 @@ app.use("/api/feedBack", submitFeedback);
 app.use("/api/student/auth", studentAuthRoutes);
 app.use("/api/student/main", studentMainRoutes);
 app.use("/api/student/jobs", studentJobRoutes);
+app.use("/api/student/courses", studentCoursesRoutes);
 app.use("/api/student/workshop", studentWorkshopRoutes);
 
 // admin routes

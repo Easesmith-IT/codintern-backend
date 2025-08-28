@@ -31,6 +31,7 @@
     "express-rate-limit": "^8.0.1",
     "express-session": "^1.18.2",
     "joi": "^18.0.1",
+    "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.4",
     "morgan": "^1.10.1",

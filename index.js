@@ -17,10 +17,12 @@ const studentAuthRoutes = require("./routes/studentAuthRoutes");
 const studentMainRoutes = require("./routes/studentMainRoutes");
 const studentJobRoutes = require("./routes/studentJobRoutes");
 const studentCoursesRoutes = require("./routes/studentCoursesRoutes");
+const studentCourseApplicationRoutes = require("./routes/studentCourseApplicationRoutes");
 const studentWorkshopRoutes = require("./routes/studentWorkshopRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const courseRoutes = require("./routes/courseRoutes");
+const courseApplicationRoutes = require("./routes/courseApplicationRoutes");
 const instructorRoutes = require("./routes/instructorRoutes");
 
 const { submitFeedback } = require("./controllers/feedbackController");
@@ -84,12 +86,14 @@ app.use("/api/student/auth", studentAuthRoutes);
 app.use("/api/student/main", studentMainRoutes);
 app.use("/api/student/jobs", studentJobRoutes);
 app.use("/api/student/courses", studentCoursesRoutes);
+app.use("/api/student/course-applications", studentCourseApplicationRoutes);
 app.use("/api/student/workshop", studentWorkshopRoutes);
 
 // admin routes
 app.use("/api/admin/admins", adminRoutes);
 app.use("/api/admin/jobs", jobRoutes);
 app.use("/api/admin/courses", courseRoutes);
+app.use("/api/admin/course-applications", courseApplicationRoutes);
 app.use("/api/admin/instructors", instructorRoutes);
 
 const PORT = process.env.PORT || 4001;

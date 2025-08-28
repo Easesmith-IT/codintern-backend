@@ -1,7 +1,13 @@
 const mongoose = require("mongoose");
+const Counter = require("../Counter");
 
 const CourseApplicationSchema = new mongoose.Schema(
   {
+    customId: {
+      type: String,
+      unique: true,
+      // required: true,
+    },
     student: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Student",
@@ -72,5 +78,18 @@ const CourseApplicationSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+CourseApplicationSchema.pre("save", async function (next) {
+  if (this.isNew) {
+    const counter = await Counter.findOneAndUpdate(
+      { name: "Course Application" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+
+    this.customId = `CAP${counter.seq.toString().padStart(4, "0")}`;
+  }
+  next();
+});
 
 module.exports = mongoose.model("CourseApplication", CourseApplicationSchema);

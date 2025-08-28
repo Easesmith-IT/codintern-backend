@@ -148,23 +148,28 @@ exports.getCourses = async (queryParams) => {
 // Get course by ID or customId
 exports.getCourseById = async (id) => {
   let course;
+  const populateFields = "firstName lastName email expertise bio profileImage";
 
   // Check if it's MongoDB ObjectId
   if (id.match(/^[0-9a-fA-F]{24}$/)) {
-    course = await Course.findById(id).populate(
-      "instructors",
-      "firstName lastName email expertise bio profileImage"
-    );
+    course = await Course.findById(id).populate("instructors", populateFields);
   } else {
     // Else search by customId or slug
     course = await Course.findOne({
       $or: [{ customId: id }, { slug: id }],
-    }).populate("instructors", "name email expertise bio profileImage");
+    }).populate("instructors", populateFields);
   }
 
   if (!course) {
     throw new AppError("Course not found", 404);
   }
+
+  course = course.toObject({ virtuals: true });
+
+  course.totalLessons = course.modules.reduce(
+    (sum, mod) => sum + (mod.lessons ? mod.lessons.length : 0),
+    0
+  );
 
   return course;
 };

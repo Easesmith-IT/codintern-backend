@@ -211,7 +211,7 @@ exports.updateAdditionalDetails = catchAsync(async (req, res, next) => {
       console.error("Error uploading image:", error);
       return next(new AppError("Failed to upload syllabus pdf", 500));
     }
-    update.brochure = imageUrl;
+    update.syllabusFile = imageUrl;
   }
 
   const course = await courseService.updateCourse(req.params.id, update);

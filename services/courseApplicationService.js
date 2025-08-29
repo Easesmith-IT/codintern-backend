@@ -360,14 +360,25 @@ exports.exportApplicationsByCourse = async (courseId, queryParams) => {
     "email",
     "education",
     "graduationYear",
+    "appliedAt",
   ];
 
-  const records = await CourseApplication.find(query)
+  let records = await CourseApplication.find(query)
     .select(fields.join(" "))
     .lean();
 
-  console.log("final query", query);
-  console.log("records", records);
+    records = records.map((r) => ({
+      ...r,
+      appliedAt: r.appliedAt
+        ? new Date(r.appliedAt).toLocaleString("en-IN", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : "",
+    }));
 
   const parser = new Parser({ fields });
   const csv = parser.parse(records);

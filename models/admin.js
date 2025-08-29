@@ -40,12 +40,32 @@ const permissionSchema = new mongoose.Schema(
       enum: ["none", "read", "read&write"],
       default: "none",
     },
+    course: {
+      type: String,
+      enum: ["none", "read", "read&write"],
+      default: "none",
+    },
     job: {
       type: String,
       enum: ["none", "read", "read&write"],
       default: "none",
     },
     student: {
+      type: String,
+      enum: ["none", "read", "read&write"],
+      default: "none",
+    },
+    instructor: {
+      type: String,
+      enum: ["none", "read", "read&write"],
+      default: "none",
+    },
+    content: {
+      type: String,
+      enum: ["none", "read", "read&write"],
+      default: "none",
+    },
+    faq: {
       type: String,
       enum: ["none", "read", "read&write"],
       default: "none",

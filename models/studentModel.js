@@ -229,9 +229,6 @@ const studentSchema = new mongoose.Schema(
         default: [],
       },
     },
-    currentRole: {
-      type: String,
-    },
     refreshToken: String,
     tokenVersion: {
       type: Number,

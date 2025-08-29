@@ -32,6 +32,8 @@ exports.getInstructors = async (queryParams) => {
     sortOrder = "desc",
     getAll = false,
   } = queryParams;
+  console.log("queryParams", queryParams);
+
   page = parseInt(page);
   limit = parseInt(limit);
   getAll = getAll === "true" || getAll === true; // ensure boolean
@@ -41,7 +43,7 @@ exports.getInstructors = async (queryParams) => {
   // Build query object
   let query = {};
 
-  if (isActive !== undefined) {
+  if (isActive !== undefined && isActive !== "all") {
     query.isActive = isActive === "true";
   }
 
@@ -72,6 +74,7 @@ exports.getInstructors = async (queryParams) => {
   //   .limit(limit)
   //   .lean();
 
+  console.log("query", query);
   let instructorsQuery = Instructor.find(query).sort({ createdAt: -1 }); // latest first
 
   if (!getAll) {
@@ -86,6 +89,8 @@ exports.getInstructors = async (queryParams) => {
   }
 
   const instructors = await instructorsQuery;
+
+  console.log("instructors", instructors);
 
   return {
     instructors,

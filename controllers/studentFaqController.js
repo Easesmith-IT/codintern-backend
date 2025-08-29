@@ -8,6 +8,8 @@ exports.getFaqsByCategoryForStudents = catchAsync(async (req, res, next) => {
   const { category } = req.params;
   const { courseId } = req.query;
 
+  console.log("category", category);
+
   const validCategories = ["General", "Courses"];
   if (!validCategories.includes(category)) {
     return next(

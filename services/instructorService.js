@@ -174,3 +174,25 @@ exports.toggleInstructorStatus = async (id) => {
 
   return instructor;
 };
+
+exports.changePassword = async (id, oldPassword, newPassword) => {
+  const instructor = await Instructor.findById(id);
+
+  if (!instructor) {
+    throw new AppError("Instructor not found", 404);
+  }
+
+  // Compare old password
+  const isMatch = await bcrypt.compare(oldPassword, instructor.password);
+  if (!isMatch) {
+    throw new AppError("Old password is incorrect", 400);
+  }
+
+  // Hash new password
+  const salt = await bcrypt.genSalt(10);
+  instructor.password = await bcrypt.hash(newPassword, salt);
+
+  await instructor.save();
+
+  return instructor;
+};

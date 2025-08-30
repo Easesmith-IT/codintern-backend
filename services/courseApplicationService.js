@@ -367,25 +367,24 @@ exports.exportApplicationsByCourse = async (courseId, queryParams) => {
     .select(fields.join(" "))
     .lean();
 
-    records = records.map((r) => ({
-      ...r,
-      appliedAt: r.appliedAt
-        ? new Date(r.appliedAt).toLocaleString("en-IN", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        : "",
-    }));
+  records = records.map((r) => ({
+    ...r,
+    appliedAt: r.appliedAt
+      ? new Date(r.appliedAt).toLocaleString("en-IN", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "",
+  }));
 
   const parser = new Parser({ fields });
   const csv = parser.parse(records);
 
   return csv;
 };
-
 
 // Get application statistics
 exports.getApplicationStats = async (queryParams = {}) => {

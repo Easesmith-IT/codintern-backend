@@ -8,6 +8,8 @@ exports.createInstructor = catchAsync(async (req, res, next) => {
   const image = req?.file;
   let profileImageUrl;
 
+  console.log("image", image);
+
   // Upload profile image if provided
   if (image) {
     try {
@@ -17,6 +19,7 @@ exports.createInstructor = catchAsync(async (req, res, next) => {
       return next(new AppError("Failed to upload profile image", 500));
     }
   }
+  console.log("profileImageUrl", profileImageUrl);
 
   const instructorData = {
     ...req.body,
@@ -73,6 +76,8 @@ exports.updateInstructor = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const image = req?.file;
   let profileImageUrl;
+
+  console.log("image", image);
 
   // Upload new profile image if provided
   if (image) {
@@ -135,7 +140,28 @@ exports.toggleInstructorStatus = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: `Instructor status updated to ${instructor.isActive ? 'active' : 'inactive'}`,
+    message: `Instructor status updated to ${instructor.isActive ? "active" : "inactive"}`,
     instructor,
+  });
+});
+
+exports.changePassword = catchAsync(async (req, res, next) => {
+  const { oldPassword, newPassword, instructorId } = req.body;
+
+  const instructor = await instructorService.changePassword(
+    instructorId,
+    oldPassword,
+    newPassword
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Password updated successfully",
+    instructor: {
+      id: instructor._id,
+      email: instructor.email,
+      firstName: instructor.firstName,
+      lastName: instructor.lastName,
+    },
   });
 });

@@ -6,6 +6,7 @@ const {
   updateInstructor,
   deleteInstructor,
   toggleInstructorStatus,
+  changePassword,
 } = require("../controllers/instructorController");
 const {
   createInstructorSchema,
@@ -42,5 +43,7 @@ router.delete("/:id", deleteInstructor);
 
 // Toggle instructor status (active/inactive)
 router.patch("/:id/toggle-status", toggleInstructorStatus);
+
+router.patch("/change-password", changePassword);
 
 module.exports = router;

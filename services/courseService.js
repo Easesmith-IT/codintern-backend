@@ -1,4 +1,5 @@
 const Course = require("../models/course/Course");
+const Instructor = require("../models/course/Instructor");
 const AppError = require("../utils/appError");
 
 // Create draft
@@ -58,7 +59,25 @@ exports.publishCourse = async (courseId, data, next) => {
     throw new AppError("Course not found", 404);
   }
 
-  if (data.instructors) course.instructors = data.instructors;
+  // if (data.instructors) course.instructors = data.instructors;
+  if (data.instructors) {
+    const newInstructors = data.instructors;
+
+    // 🔹 Remove course from instructors no longer assigned
+    await Instructor.updateMany(
+      { courses: course._id, _id: { $nin: newInstructors } },
+      { $pull: { courses: course._id } }
+    );
+
+    // 🔹 Add course to all instructors in the new list
+    await Instructor.updateMany(
+      { _id: { $in: newInstructors } },
+      { $addToSet: { courses: course._id } }
+    );
+
+    // 🔹 Update course side
+    course.instructors = newInstructors;
+  }
 
   if (!course.pricing || !course.modules.length) {
     throw new AppError("Course is missing pricing or modules", 400);

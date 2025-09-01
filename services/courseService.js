@@ -111,7 +111,10 @@ exports.getCourses = async (queryParams) => {
   const skip = (page - 1) * limit;
 
   // Build query object
-  let query = { isFastTrack: isFastTrack === "true" };
+let query = {};
+if (isFastTrack !== undefined) {
+  query.isFastTrack = isFastTrack === "true";
+}
 
   if (
     status &&

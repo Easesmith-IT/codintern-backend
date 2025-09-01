@@ -219,6 +219,11 @@ const courseSchema = new mongoose.Schema(
     },
     onlinePlatform: { type: String }, // e.g. Zoom, Google Meet, MS Teams, custom LMS
     meetingLink: { type: String }, // optional, if generated per batch/session
+
+    isFastTrack: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

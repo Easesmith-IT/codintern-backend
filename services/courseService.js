@@ -103,6 +103,7 @@ exports.getCourses = async (queryParams) => {
     search,
     sortBy = "createdAt",
     sortOrder = "desc",
+    isFastTrack,
   } = queryParams;
   page = parseInt(page);
   limit = parseInt(limit);
@@ -110,7 +111,7 @@ exports.getCourses = async (queryParams) => {
   const skip = (page - 1) * limit;
 
   // Build query object
-  let query = {};
+  let query = { isFastTrack: isFastTrack === "true" };
 
   if (
     status &&
@@ -139,6 +140,9 @@ exports.getCourses = async (queryParams) => {
       { subCategory: { $regex: search, $options: "i" } },
     ];
   }
+
+  console.log("query", query);
+  
 
   // Build sort object
   const sort = {};

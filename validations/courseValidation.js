@@ -11,6 +11,7 @@ exports.createCourseSchema = Joi.object({
   language: Joi.string().default("English"),
   thumbnail: Joi.string().uri().optional(),
   introVideo: Joi.string().uri().optional(),
+  isFastTrack: Joi.boolean().optional(),
 });
 
 // STEP 2: Details (pricing + certificate + highlights)

@@ -157,16 +157,18 @@ exports.updateAdditionalDetails = catchAsync(async (req, res, next) => {
     totalSeats,
     interviews,
     integratedInternship,
+    averageRating,
   } = req.body;
   const { brochure = [], syllabusFile = [], featureIcons = [] } = req.files;
 
-  console.log("req.files", req.files);
+  console.log("req.body", req.body);
 
   const update = {
     courseDuration,
     classTiming,
     totalSeats,
     interviews,
+    averageRating,
     integratedInternship: JSON.parse(integratedInternship),
   };
 

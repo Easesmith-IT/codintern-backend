@@ -76,7 +76,7 @@ module.exports = (err, req, res, next) => {
   if (err.code === "LIMIT_FILE_SIZE") {
     return res.status(413).json({
       success: false,
-      message: "File too large. Maximum allowed size is 10MB.",
+      message: "File too large. Maximum allowed size is 4.5MB.",
     });
   }
 

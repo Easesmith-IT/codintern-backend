@@ -161,6 +161,7 @@ exports.updateAdditionalSchema = Joi.object({
   venue: Joi.string().valid("online").default("online"),
   onlinePlatform: Joi.string().optional(),
   meetingLink: Joi.string().uri().optional(),
+  averageRating: Joi.number().optional(),
 });
 
 // STEP 6: Publish

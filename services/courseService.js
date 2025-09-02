@@ -4,6 +4,8 @@ const AppError = require("../utils/appError");
 
 // Create draft
 exports.createCourse = async (data) => {
+  console.log("data",data);
+  
   const course = new Course(data);
   return await course.save();
 };

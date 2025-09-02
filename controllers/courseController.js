@@ -5,9 +5,8 @@ const { uploadImage } = require("../utils/fileUploadToAzure");
 
 // STEP 1: Create draft
 exports.createCourse = catchAsync(async (req, res) => {
-
   console.log("req.body", req.body);
-  
+
   const image = req?.file;
   let imageUrl;
   if (image) {

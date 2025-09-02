@@ -37,6 +37,7 @@ const batchSchema = new mongoose.Schema(
       time: { start: String, end: String }, // e.g. "10:00 AM"
     },
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    
     instructor: { type: mongoose.Schema.Types.ObjectId, ref: "Instructor" },
     seatsLimit: { type: Number, default: 50 },
 
@@ -145,6 +146,7 @@ const courseSchema = new mongoose.Schema(
       default: "beginner",
     },
     language: { type: String, default: "English" },
+    studentCount: { type: Number, default: 0 },
 
     // Course Extras
     courseDuration: { type: String }, // e.g. "3 months"

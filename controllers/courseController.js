@@ -1,3 +1,4 @@
+const Course = require("../models/course/Course");
 const courseService = require("../services/courseService");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
@@ -113,6 +114,8 @@ exports.updateCourseExtras = catchAsync(async (req, res) => {
   console.log("req.body", req.body);
   const { projectImages = [], batchImages = [] } = req.files;
 
+  const existingCourse = await Course.findById(req.params.id).lean();
+
   if (req.body.projects) {
     let projects = JSON.parse(req.body.projects); // because form-data will stringify JSON
     // let projects = req.body.projects; // because form-data will stringify JSON
@@ -140,30 +143,48 @@ exports.updateCourseExtras = catchAsync(async (req, res) => {
   }
 
   if (req.body.batches) {
-    let batches = JSON.parse(req.body.batches); // because form-data will stringify JSON
-    // let batches = req.body.batches; // because form-data will stringify JSON
+    let batches = JSON.parse(req.body.batches);
 
-    console.log("batches", batches);
+    // fetch existing course
+    const oldBatches = existingCourse?.batches || [];
 
-    if (batchImages && batchImages?.length > 0) {
+    if (batchImages && batchImages.length > 0) {
       const uploadedImages = await Promise.all(
         batchImages.map(async (file) => {
           try {
-            const url = await uploadImage(file); // your Azure upload helper
-            return url;
+            return await uploadImage(file);
           } catch (error) {
-            console.error("Error uploading icon:", error);
-            throw new AppError("Failed to upload feature icons", 500);
+            console.error("Error uploading batch image:", error);
+            throw new AppError("Failed to upload batch images", 500);
           }
         })
       );
+
       batches = batches.map((batch, index) => {
+        const oldBatch = oldBatches.find(
+          (b) => b._id?.toString() === batch._id
+        ); // match by id if present
         return {
           ...batch,
-          image: uploadedImages[index], // fallback if not uploaded
+          image: uploadedImages[index] || oldBatch?.image || null, // ✅ keep old if not updated
+        };
+      });
+    } else {
+      // no new images uploaded → keep old images
+      batches = batches.map((batch) => {
+        const oldBatch = oldBatches.find(
+          (b) => b._id?.toString() === batch._id
+        );
+
+        console.log("oldBatch", oldBatch);
+        
+        return {
+          ...batch,
+          image: oldBatch?.image || null,
         };
       });
     }
+
     update.batches = batches;
   }
 

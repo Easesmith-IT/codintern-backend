@@ -31,13 +31,14 @@ const batchSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     startDate: { type: Date, required: true },
+    image: { type: String, required: false },
     endDate: { type: Date },
     schedule: {
       days: [String], // e.g. ["Mon", "Wed", "Fri"]
       time: { start: String, end: String }, // e.g. "10:00 AM"
     },
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    
+
     instructor: { type: mongoose.Schema.Types.ObjectId, ref: "Instructor" },
     seatsLimit: { type: Number, default: 50 },
 
@@ -78,6 +79,11 @@ const certificateSchema = new mongoose.Schema(
       type: String,
       required: true,
     }, // e.g. "Master Certification in Data Science & Analytics"
+
+    description: {
+      type: String,
+      required: true,
+    },
 
     provider: {
       type: String,

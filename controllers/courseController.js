@@ -109,26 +109,30 @@ exports.addModules = catchAsync(async (req, res) => {
 // STEP 4: Update extras (projects + batches)
 exports.updateCourseExtras = catchAsync(async (req, res) => {
   const update = {};
+  console.log("req.files", req.files);
+  console.log("req.body", req.body);
+  const { projectImages = [], batchImages = [] } = req.files;
 
   if (req.body.projects) {
     let projects = JSON.parse(req.body.projects); // because form-data will stringify JSON
+    // let projects = req.body.projects; // because form-data will stringify JSON
 
-    if (req.files && req.files.length > 0) {
+    if (projectImages && projectImages?.length > 0) {
       const uploadedImages = await Promise.all(
-        req.files.map(async (file) => {
+        projectImages.map(async (file) => {
           try {
             const url = await uploadImage(file); // your Azure upload helper
             return url;
           } catch (error) {
-            console.error("Error uploading project icon:", error);
-            throw new AppError("Failed to upload project icon", 500);
+            console.error("Error uploading icon:", error);
+            throw new AppError("Failed to upload feature icons", 500);
           }
         })
       );
 
       projects = projects.map((project, index) => ({
         ...project,
-        icon: uploadedImages[index] || project.icon, // fallback if not uploaded
+        icon: uploadedImages[index], // fallback if not uploaded
       }));
     }
 
@@ -136,7 +140,31 @@ exports.updateCourseExtras = catchAsync(async (req, res) => {
   }
 
   if (req.body.batches) {
-    update.batches = JSON.parse(req.body.batches);
+    let batches = JSON.parse(req.body.batches); // because form-data will stringify JSON
+    // let batches = req.body.batches; // because form-data will stringify JSON
+
+    console.log("batches", batches);
+
+    if (batchImages && batchImages?.length > 0) {
+      const uploadedImages = await Promise.all(
+        batchImages.map(async (file) => {
+          try {
+            const url = await uploadImage(file); // your Azure upload helper
+            return url;
+          } catch (error) {
+            console.error("Error uploading icon:", error);
+            throw new AppError("Failed to upload feature icons", 500);
+          }
+        })
+      );
+      batches = batches.map((batch, index) => {
+        return {
+          ...batch,
+          image: uploadedImages[index], // fallback if not uploaded
+        };
+      });
+    }
+    update.batches = batches;
   }
 
   const course = await courseService.updateCourse(req.params.id, update);

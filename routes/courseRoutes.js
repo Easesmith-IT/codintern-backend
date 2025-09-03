@@ -56,8 +56,11 @@ router.post("/:id/modules", validate(addModulesSchema), addModules);
 // STEP 4: Extras
 router.patch(
   "/:id/extras",
-  validate(updateExtrasSchema),
-  upload.array("projectImages"),
+  upload.fields([
+    { name: "projectImages", maxCount: 10 }, // multiple images for projects
+    { name: "batchImages", maxCount: 10 }, // multiple images for batches
+  ]),
+  // validate(updateExtrasSchema),
   updateCourseExtras
 );
 

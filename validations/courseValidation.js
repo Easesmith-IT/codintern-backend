@@ -26,6 +26,7 @@ exports.updateDetailsSchema = Joi.object({
 
   certificate: Joi.object({
     title: Joi.string().required(),
+    description: Joi.string().required(),
     provider: Joi.string().optional(),
     certificateLink: Joi.string().uri().optional(),
     issueDate: Joi.date().optional(),

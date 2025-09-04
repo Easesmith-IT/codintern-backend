@@ -177,7 +177,7 @@ exports.updateCourseExtras = catchAsync(async (req, res) => {
         );
 
         console.log("oldBatch", oldBatch);
-        
+
         return {
           ...batch,
           image: oldBatch?.image || null,

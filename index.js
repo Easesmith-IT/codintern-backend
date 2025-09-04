@@ -28,6 +28,7 @@ const courseApplicationRoutes = require("./routes/courseApplicationRoutes");
 const instructorRoutes = require("./routes/instructorRoutes");
 const faqRoutes = require("./routes/faqRoutes");
 const workshopRoutes = require("./routes/workshopRoutes");
+const contentRoutes = require("./routes/contentRoutes");
 
 const { submitFeedback } = require("./controllers/feedbackController");
 const globalErrorHandler = require("./controllers/errorController");
@@ -103,6 +104,7 @@ app.use("/api/admin/course-applications", courseApplicationRoutes);
 app.use("/api/admin/instructors", instructorRoutes);
 app.use("/api/admin/faqs", faqRoutes);
 app.use("/api/admin/workshops", workshopRoutes);
+app.use("/api/admin/content/hero-section", contentRoutes);
 
 // public FAQ routes
 // app.use("/api/faqs", faqRoutes);

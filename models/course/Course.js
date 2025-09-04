@@ -125,12 +125,13 @@ const courseSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      // unique: true,
     },
-    slug: {
-      type: String,
-      unique: true,
-      index: true,
-    },
+    // slug: {
+    //   type: String,
+    //   unique: true,
+    //   index: true,
+    // },
     description: {
       type: String,
       required: true,
@@ -237,9 +238,9 @@ const courseSchema = new mongoose.Schema(
 );
 
 courseSchema.pre("validate", function (next) {
-  if (!this.slug && this.title) {
-    this.slug = slugify(this.title, { lower: true, strict: true });
-  }
+  // if (!this.slug && this.title) {
+  //   this.slug = slugify(this.title, { lower: true, strict: true });
+  // }
 
   if (this.pricing.isFree) {
     this.pricing.price = 0;

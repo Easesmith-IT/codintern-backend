@@ -14,10 +14,25 @@ const handleCastErrorDB = (err) => {
 //   return new AppError(message, 400);
 // };
 
+// Helper to prettify field names automatically
+const prettifyField = (field) => {
+  return field
+    .replace(/([A-Z])/g, " $1") // split camelCase → camel Case
+    .replace(/_/g, " ")         // replace underscores
+    .replace(/\b\w/g, (c) => c.toUpperCase()); // capitalize words
+};
+
 const handleDuplicateFieldsDB = (err) => {
+  if (!err.keyValue) {
+    return new AppError("Duplicate value. Please use another one.", 400);
+  }
+
   const field = Object.keys(err.keyValue)[0];
   const value = err.keyValue[field];
-  const message = `${field} '${value}' is already registered. Please use another value!`;
+
+  const label = prettifyField(field);
+
+  const message = `${label} "${value}" is already taken. Please choose another.`;
   return new AppError(message, 400);
 };
 

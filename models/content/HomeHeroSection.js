@@ -64,9 +64,6 @@ const HomeHeroSectionSchema = new mongoose.Schema(
     image1: { type: String }, // store uploaded image path / URL
     image2: { type: String },
     image3: { type: String },
-    image1Preview: { type: String },
-    image2Preview: { type: String },
-    image3Preview: { type: String },
     banner1: { type: Banner1Schema, required: true },
     banner2: { type: Banner2Schema, required: true },
     banner3: { type: Banner3Schema, required: true },

@@ -20,6 +20,8 @@ const studentCoursesRoutes = require("./routes/studentCoursesRoutes");
 const studentCourseApplicationRoutes = require("./routes/studentCourseApplicationRoutes");
 const studentWorkshopRoutes = require("./routes/studentWorkshopRoutes");
 const studentFaqRoutes = require("./routes/studentFaqRoutes");
+const StudentHeroSectionRoutes = require("./routes/StudentHeroSectionRoutes");
+
 const adminRoutes = require("./routes/adminRoutes");
 const adminStudentRoutes = require("./routes/adminStudentRoutes");
 const jobRoutes = require("./routes/jobRoutes");
@@ -94,6 +96,7 @@ app.use("/api/student/courses", studentCoursesRoutes);
 app.use("/api/student/course-applications", studentCourseApplicationRoutes);
 app.use("/api/student/workshop", studentWorkshopRoutes);
 app.use("/api/student/faqs", studentFaqRoutes);
+app.use("/api/student/content/hero-section", StudentHeroSectionRoutes);
 
 // admin routes
 app.use("/api/admin/admins", adminRoutes);

@@ -4,28 +4,27 @@ const path = require("path");
 const fs = require("fs");
 
 // Replace these with your values
-const connectionString =
-  process.env.AZURE_STORAGE_CONNECTION_STRING
+const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 const containerName = "data";
 
 // Function to upload a file to Azure Blob Storage
 const uploadFileToAzure = async (filePath, fileName) => {
   const blobServiceClient =
     BlobServiceClient.fromConnectionString(connectionString);
-  console.log("string", connectionString);
+  // console.log("string", connectionString);
 
   const containerClient = blobServiceClient.getContainerClient(containerName);
-  console.log(containerClient, "container client");
+  // console.log(containerClient, "container client");
 
   const blockBlobClient = containerClient.getBlockBlobClient(fileName);
-  console.log(blockBlobClient, "blockblob client");
+  // console.log(blockBlobClient, "blockblob client");
 
   // Uploads the file
   await blockBlobClient.uploadFile(filePath);
-  console.log(`File "${fileName}" uploaded successfully line number 19`);
+  // console.log(`File "${fileName}" uploaded successfully line number 19`);
 
   const fileUrl = `${containerClient.url}/${fileName}`;
-  console.log("Generated file URL:", fileUrl);
+  // console.log("Generated file URL:", fileUrl);
   return fileUrl;
 };
 
@@ -38,34 +37,41 @@ const deleteFileFromAzure = async (fileName) => {
 
   // Deletes the file
   await blockBlobClient.delete();
-  console.log(`File "${fileName}" deleted successfully.`);
+  // console.log(`File "${fileName}" deleted successfully.`);
 };
 
 const uploadImage = async (imageFile) => {
-  console.log(imageFile, "line 35 image file");
+   const tempFilePath = imageFile.path;
+
+  // console.log(imageFile, "line 35 image file");
   if (!imageFile || !imageFile.path) {
     throw new Error("No image file found");
   }
 
   try {
     // Log the image path
-    console.log("Inside image upload function:", imageFile.path, imageFile);
+    // console.log("Inside image upload function:", imageFile.path, imageFile);
 
     const originalFileName = imageFile.originalname;
     const fileName = `images/${uuidv4()}-${originalFileName}`;
-    const filePath = imageFile.path;
 
     // Upload file to Azure and get the URL
-    const imageUrl = await uploadFileToAzure(filePath, fileName);
-    console.log("Uploaded Image URL:", imageUrl);
+    const imageUrl = await uploadFileToAzure(tempFilePath, fileName);
+    // console.log("Uploaded Image URL:", imageUrl);
 
     // Clean up the file from local storage after upload
-    fs.unlinkSync(filePath);
+    // fs.unlinkSync(filePath);
 
     return imageUrl;
   } catch (error) {
     console.error("Error uploading image:", error);
     throw new AppError("Failed to upload image", 500);
+  } finally {
+    try {
+      if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
+    } catch (err) {
+      console.error("Failed to delete temp file:", err);
+    }
   }
 };
 

@@ -21,6 +21,7 @@ const studentCourseApplicationRoutes = require("./routes/studentCourseApplicatio
 const studentWorkshopRoutes = require("./routes/studentWorkshopRoutes");
 const studentFaqRoutes = require("./routes/studentFaqRoutes");
 const StudentHeroSectionRoutes = require("./routes/StudentHeroSectionRoutes");
+const StudentContentRoutes = require("./routes/StudentContentRoutes");
 
 const adminRoutes = require("./routes/adminRoutes");
 const adminStudentRoutes = require("./routes/adminStudentRoutes");
@@ -31,6 +32,7 @@ const instructorRoutes = require("./routes/instructorRoutes");
 const faqRoutes = require("./routes/faqRoutes");
 const workshopRoutes = require("./routes/workshopRoutes");
 const contentRoutes = require("./routes/contentRoutes");
+const heroSectionContentRoutes = require("./routes/heroSectionContentRoutes");
 
 const { submitFeedback } = require("./controllers/feedbackController");
 const globalErrorHandler = require("./controllers/errorController");
@@ -97,6 +99,7 @@ app.use("/api/student/course-applications", studentCourseApplicationRoutes);
 app.use("/api/student/workshop", studentWorkshopRoutes);
 app.use("/api/student/faqs", studentFaqRoutes);
 app.use("/api/student/content/hero-section", StudentHeroSectionRoutes);
+app.use("/api/student/content", StudentContentRoutes);
 
 // admin routes
 app.use("/api/admin/admins", adminRoutes);
@@ -107,7 +110,8 @@ app.use("/api/admin/course-applications", courseApplicationRoutes);
 app.use("/api/admin/instructors", instructorRoutes);
 app.use("/api/admin/faqs", faqRoutes);
 app.use("/api/admin/workshops", workshopRoutes);
-app.use("/api/admin/content/hero-section", contentRoutes);
+app.use("/api/admin/content/hero-section", heroSectionContentRoutes);
+app.use("/api/admin/content", contentRoutes);
 
 // public FAQ routes
 // app.use("/api/faqs", faqRoutes);

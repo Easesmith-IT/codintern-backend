@@ -1,25 +1,23 @@
 const express = require("express");
-
+const router = express.Router();
 const {
-  getHomeHeroSections,
-  getHomeHeroSectionById,
-  upsertHomeHeroSection,
-} = require("../controllers/heroSectionController");
+  getContentByPage,
+  upsertContentSection,
+} = require("../controllers/contentController");
 const upload = require("../middlewares/imgUpload");
 
-const router = express.Router();
-
-// Add new or update existing HomeHeroSection
+// If you expect multiple images for a section, e.g., `images[]`
 router.post(
   "/",
   upload.fields([
-    { name: "image1", maxCount: 1 },
-    { name: "image2", maxCount: 1 },
-    { name: "image3", maxCount: 1 },
+    { name: "images", maxCount: 10 }, // generic multiple images
+    // { name: "image1", maxCount: 1 }, // HeroSection
+    // { name: "image2", maxCount: 1 },
+    // { name: "image3", maxCount: 1 },
   ]),
-  upsertHomeHeroSection
+  upsertContentSection
 );
-router.get("/", getHomeHeroSections); // Get all
-router.get("/:id", getHomeHeroSectionById); // Get by ID
+
+router.get("/:pageName", getContentByPage);
 
 module.exports = router;

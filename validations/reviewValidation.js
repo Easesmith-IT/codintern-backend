@@ -2,7 +2,7 @@ const Joi = require("joi");
 
 exports.reviewSchema = Joi.object({
   platform: Joi.string().trim().optional(),
-  rating: Joi.number().min(0).max(5).required(),
+  rating: Joi.number().min(0).max(5).precision(1).required(),
   reviewText: Joi.string().min(10).required(),
   reviewerName: Joi.string().trim().required(),
   reviewerRole: Joi.string().trim().optional().default("User"),

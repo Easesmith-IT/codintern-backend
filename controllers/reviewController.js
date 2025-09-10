@@ -42,7 +42,6 @@ exports.getReviewsByCategory = catchAsync(async (req, res, next) => {
   } = req.query;
 
   console.log("req.query", req.query);
-  
 
   // ✅ Validate category
   if (!category || !["General", "Course"].includes(category)) {
@@ -146,4 +145,36 @@ exports.updateReviewStatus = catchAsync(async (req, res, next) => {
     message: `Review status updated to '${status}' successfully`,
     data: review,
   });
+});
+
+exports.updateReview = catchAsync(async (req, res) => {
+  const { id } = req.params;
+
+  // Find review and update
+  const updatedReview = await Review.findByIdAndUpdate(
+    id,
+    { $set: req.body }, // update fields from request body
+    { new: true, runValidators: true } // return updated doc & run validation
+  );
+
+  if (!updatedReview) {
+    return res.status(404).json({ message: "Review not found" });
+  }
+
+  res.json({
+    message: "Review updated successfully",
+    data: updatedReview,
+  });
+});
+
+exports.deleteReview = catchAsync(async (req, res) => {
+  const { id } = req.params;
+
+  const deletedReview = await Review.findByIdAndDelete(id);
+
+  if (!deletedReview) {
+    return res.status(404).json({ message: "Review not found" });
+  }
+
+  res.json({ success: true, message: "Review deleted successfully" });
 });

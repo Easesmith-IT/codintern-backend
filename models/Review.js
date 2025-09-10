@@ -8,14 +8,11 @@ const reviewSchema = new mongoose.Schema(
     },
     rating: {
       type: Number,
-      min: 0,
-      max: 5,
       required: true,
-      validate: {
-        validator: Number.isInteger,
-        message: "Rating must be an integer between 0 and 5",
-      },
+      min: [0, "Rating must be at least 0"],
+      max: [5, "Rating cannot exceed 5"],
     },
+
     reviewText: {
       type: String,
       required: true,

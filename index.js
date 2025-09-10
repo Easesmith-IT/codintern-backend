@@ -77,6 +77,7 @@ app.use(
       "http://localhost:3000",
       process.env.FRONT_END_URL,
       process.env.ADMIN_FRONT_END_URL,
+      "https://cod-intern-admin-panel.vercel.app",
     ],
     credentials: true,
   })

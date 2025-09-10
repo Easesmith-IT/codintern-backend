@@ -20,8 +20,8 @@ const studentCoursesRoutes = require("./routes/studentCoursesRoutes");
 const studentCourseApplicationRoutes = require("./routes/studentCourseApplicationRoutes");
 const studentWorkshopRoutes = require("./routes/studentWorkshopRoutes");
 const studentFaqRoutes = require("./routes/studentFaqRoutes");
-const studentHeroSectionRoutes = require("./routes/studentHeroSectionRoutes");
-const studentContentRoutes = require("./routes/studentContentRoutes");
+const studentHeroSectionRoutes = require("./routes/StudentHeroSectionRoutes");
+const studentContentRoutes = require("./routes/StudentContentRoutes");
 const studentReviewRoutes = require("./routes/studentReviewRoutes");
 
 const adminRoutes = require("./routes/adminRoutes");

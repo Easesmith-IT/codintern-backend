@@ -20,8 +20,9 @@ const studentCoursesRoutes = require("./routes/studentCoursesRoutes");
 const studentCourseApplicationRoutes = require("./routes/studentCourseApplicationRoutes");
 const studentWorkshopRoutes = require("./routes/studentWorkshopRoutes");
 const studentFaqRoutes = require("./routes/studentFaqRoutes");
-const StudentHeroSectionRoutes = require("./routes/StudentHeroSectionRoutes");
-const StudentContentRoutes = require("./routes/StudentContentRoutes");
+const studentHeroSectionRoutes = require("./routes/studentHeroSectionRoutes");
+const studentContentRoutes = require("./routes/studentContentRoutes");
+const studentReviewRoutes = require("./routes/studentReviewRoutes");
 
 const adminRoutes = require("./routes/adminRoutes");
 const adminStudentRoutes = require("./routes/adminStudentRoutes");
@@ -31,8 +32,9 @@ const courseApplicationRoutes = require("./routes/courseApplicationRoutes");
 const instructorRoutes = require("./routes/instructorRoutes");
 const faqRoutes = require("./routes/faqRoutes");
 const workshopRoutes = require("./routes/workshopRoutes");
-const contentRoutes = require("./routes/contentRoutes");
 const heroSectionContentRoutes = require("./routes/heroSectionContentRoutes");
+const contentRoutes = require("./routes/contentRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 const { submitFeedback } = require("./controllers/feedbackController");
 const globalErrorHandler = require("./controllers/errorController");
@@ -98,8 +100,9 @@ app.use("/api/student/courses", studentCoursesRoutes);
 app.use("/api/student/course-applications", studentCourseApplicationRoutes);
 app.use("/api/student/workshop", studentWorkshopRoutes);
 app.use("/api/student/faqs", studentFaqRoutes);
-app.use("/api/student/content/hero-section", StudentHeroSectionRoutes);
-app.use("/api/student/content", StudentContentRoutes);
+app.use("/api/student/content/hero-section", studentHeroSectionRoutes);
+app.use("/api/student/content", studentContentRoutes);
+app.use("/api/student/reviews", studentReviewRoutes);
 
 // admin routes
 app.use("/api/admin/admins", adminRoutes);
@@ -112,6 +115,7 @@ app.use("/api/admin/faqs", faqRoutes);
 app.use("/api/admin/workshops", workshopRoutes);
 app.use("/api/admin/content/hero-section", heroSectionContentRoutes);
 app.use("/api/admin/content", contentRoutes);
+app.use("/api/admin/reviews", reviewRoutes);
 
 // public FAQ routes
 // app.use("/api/faqs", faqRoutes);

@@ -14,6 +14,7 @@ exports.getWorkshops = catchAsync(async (req, res) => {
     search,
     sortField = "createdAt",
     sortOrder = "desc",
+    type,
   } = req.query;
 
   const query = {};
@@ -22,6 +23,7 @@ exports.getWorkshops = catchAsync(async (req, res) => {
   if (gender) query.gender = gender;
   if (year) query.year = year;
   if (branch) query.branch = branch;
+  if (type) query.type = type;
   if (collegeName) query.collegeName = { $regex: collegeName, $options: "i" };
 
   // Search in name, email, mobile, rollNo
@@ -65,18 +67,20 @@ exports.getWorkshops = catchAsync(async (req, res) => {
 });
 
 exports.exportWorkshops = catchAsync(async (req, res) => {
-  let { from, to } = req.query;
+  let { from, to, type } = req.query;
 
-  let query = {};
+  let query = { type };
   if (from || to) {
     query.createdAt = {};
     if (from) {
-      from = new Date(from).toISOString(); // ensure valid format
-      query.createdAt.$gte = new Date(from);
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+      query.createdAt.$gte = startOfDay;
     }
     if (to) {
-      to = new Date(to).toISOString();
-      query.createdAt.$lte = new Date(to);
+      const endOfDay = new Date(to);
+      endOfDay.setHours(23, 59, 59, 999);
+      query.createdAt.$lte = endOfDay;
     }
   }
 
@@ -181,12 +185,14 @@ exports.exportFeedbacks = catchAsync(async (req, res) => {
   if (from || to) {
     query.createdAt = {};
     if (from) {
-      from = new Date(from).toISOString(); // ensure valid format
-      query.createdAt.$gte = new Date(from);
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+      query.createdAt.$gte = startOfDay;
     }
     if (to) {
-      to = new Date(to).toISOString();
-      query.createdAt.$lte = new Date(to);
+      const endOfDay = new Date(to);
+      endOfDay.setHours(23, 59, 59, 999);
+      query.createdAt.$lte = endOfDay;
     }
   }
 

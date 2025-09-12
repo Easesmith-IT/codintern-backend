@@ -21,13 +21,11 @@ const workshopRegistrationSchema = new mongoose.Schema(
       required: true,
       trim: true,
       lowercase: true,
-      unique: true,
       match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"],
     },
     mobileNumber: {
       type: String,
       required: true,
-      unique: true,
       match: [/^[0-9]{10}$/, "Please enter a valid 10-digit mobile number"],
     },
     collegeName: {
@@ -49,11 +47,25 @@ const workshopRegistrationSchema = new mongoose.Schema(
     universityRollNo: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
+    },
+    type: {
+      type: String,
+      default: "workshop",
+      enum: ["workshop", "generative-ai"],
     },
   },
   { timestamps: true }
+);
+
+workshopRegistrationSchema.index({ email: 1, type: 1 }, { unique: true });
+workshopRegistrationSchema.index(
+  { mobileNumber: 1, type: 1 },
+  { unique: true }
+);
+workshopRegistrationSchema.index(
+  { universityRollNo: 1, type: 1 },
+  { unique: true }
 );
 
 const WorkshopRegistration = mongoose.model(

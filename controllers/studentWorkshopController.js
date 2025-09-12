@@ -13,6 +13,7 @@ exports.registerWorkshop = catchAsync(async (req, res, next) => {
     branch,
     year,
     universityRollNo,
+    type,
   } = req.body;
 
   if (
@@ -24,7 +25,8 @@ exports.registerWorkshop = catchAsync(async (req, res, next) => {
     !collegeName ||
     !branch ||
     !year ||
-    !universityRollNo
+    !universityRollNo ||
+    !type
   ) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -35,8 +37,14 @@ exports.registerWorkshop = catchAsync(async (req, res, next) => {
   }
 
   const existing = await WorkshopRegistration.findOne({
-    $or: [{ email }, { mobileNumber }],
+    $or: [
+      { $and: [{ email }, { type }] },
+      { $and: [{ mobileNumber }, { type }] },
+    ],
   });
+
+  console.log("existing", existing);
+  
 
   if (existing) {
     return next(
@@ -59,6 +67,7 @@ exports.registerWorkshop = catchAsync(async (req, res, next) => {
     branch,
     year,
     universityRollNo,
+    type,
   });
 
   res.status(201).json({

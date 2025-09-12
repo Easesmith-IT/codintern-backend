@@ -302,14 +302,16 @@ exports.exportApplicationsByCourse = async (courseId, queryParams) => {
 
   let query = { course: courseId };
   if (from || to) {
-    query.appliedAt = {};
+    query.createdAt = {};
     if (from) {
-      from = new Date(from).toISOString(); // ensure valid format
-      query.appliedAt.$gte = new Date(from);
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+      query.createdAt.$gte = startOfDay;
     }
     if (to) {
-      to = new Date(to).toISOString();
-      query.appliedAt.$lte = new Date(to);
+      const endOfDay = new Date(to);
+      endOfDay.setHours(23, 59, 59, 999);
+      query.createdAt.$lte = endOfDay;
     }
   }
 

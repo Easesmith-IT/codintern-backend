@@ -1,6 +1,10 @@
 const WorkshopRegistration = require("../models/WorkshopRegistration");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const {
+  getGenerativeAiWorkshopRegistrationEmailTemplate,
+} = require("../utils/emailTemplate");
+const { resend } = require("../utils/resend");
 
 exports.registerWorkshop = catchAsync(async (req, res, next) => {
   const {
@@ -44,7 +48,6 @@ exports.registerWorkshop = catchAsync(async (req, res, next) => {
   });
 
   console.log("existing", existing);
-  
 
   if (existing) {
     return next(
@@ -69,6 +72,27 @@ exports.registerWorkshop = catchAsync(async (req, res, next) => {
     universityRollNo,
     type,
   });
+
+  const htmlContent = getGenerativeAiWorkshopRegistrationEmailTemplate({
+    fullName,
+    email,
+  });
+
+  try {
+    await resend.emails.send({
+      from: "Codintern <no-reply@codintern.com>",
+      to: email,
+      subject: "🎉 Your Registration is Confirmed - Generative AI Workshop",
+      html: htmlContent,
+    });
+  } catch (error) {
+    console.error("Failed to send email:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to send confirmation email",
+      error: error?.message || "Unknown error",
+    });
+  }
 
   res.status(201).json({
     success: true,

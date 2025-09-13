@@ -1,13 +1,16 @@
 const multer = require("multer");
 const path = require("path");
+const crypto = require("crypto");
 
 // Set storage engine
 const storage = multer.diskStorage({
   destination: "/tmp", // Define the destination folder
   filename: (req, file, cb) => {
+    const uniqueSuffix =
+      Date.now() + "-" + crypto.randomBytes(4).toString("hex");
     cb(
       null,
-      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
+      `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`
     );
   },
 });

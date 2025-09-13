@@ -12,7 +12,7 @@ exports.upsertContentSection = catchAsync(async (req, res, next) => {
   console.log("req.query", req.query);
   console.log("req.files", req.files);
   console.log("req.body", req.body);
-  
+
   let data = req.body;
 
   const files = req.files || {};
@@ -22,17 +22,35 @@ exports.upsertContentSection = catchAsync(async (req, res, next) => {
 
   // 2. Handle uploaded images
   if (files.images) {
-    const uploadedImages = await Promise.all(
-      files.images.map(async (file) => {
-        try {
-          return await uploadImage(file); // returns URL
-        } catch (error) {
-          console.error("Error uploading image:", error);
-          return next(new AppError("Failed to upload image", 500));
-        }
-      })
+    const results = await Promise.allSettled(
+      files.images.map((file) => uploadImage(file))
     );
-    data.images = uploadedImages.map((url) => ({ image: url }));
+
+    const successes = results
+      .filter((r) => r.status === "fulfilled")
+      .map((r) => r.value);
+    const failures = results.filter((r) => r.status === "rejected");
+    if (failures.length) {
+      console.warn("Some image uploads failed:", failures);
+      // optionally: return next(new AppError("Some uploads failed", 500));
+    }
+
+    console.log("results", results);
+
+    // const uploadedImages = await Promise.all(
+    //   files.images.map(async (file) => {
+    //     try {
+    //       return await uploadImage(file); // returns URL
+    //     } catch (error) {
+    //       console.error("Error uploading image:", error);
+    //       return next(new AppError("Failed to upload image", 500));
+    //     }
+    //   })
+    // );
+
+    // console.log("uploadedImages", uploadedImages);
+
+    data.images = successes.map((url) => ({ image: url }));
   }
 
   let contentSection;

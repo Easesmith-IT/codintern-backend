@@ -54,6 +54,17 @@ const workshopRegistrationSchema = new mongoose.Schema(
       default: "workshop",
       enum: ["workshop", "generative-ai"],
     },
+    status: {
+      type: String,
+      enum: ["pending", "paid", "failed"],
+      default: "pending",
+    },
+    paymentInfo: {
+      paymentId: { type: String },
+      paymentLinkId: { type: String },
+      amount: { type: Number },
+      method: { type: String },
+    },
   },
   { timestamps: true }
 );
@@ -67,6 +78,14 @@ workshopRegistrationSchema.index(
   { universityRollNo: 1, type: 1 },
   { unique: true }
 );
+
+// 🔹 Auto-update status before saving
+workshopRegistrationSchema.pre("save", function (next) {
+  if (this.type === "workshop") {
+    this.status = "paid";
+  }
+  next();
+});
 
 const WorkshopRegistration = mongoose.model(
   "WorkshopRegistration",

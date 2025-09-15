@@ -35,9 +35,9 @@ exports.razorpayWebhook = async (req, res) => {
       }
     }
 
-    res.json({ status: "ok" });
-  } catch (err) {
+    res.redirect(`${process.env.FRONT_END_URL}/payment/success`);
+} catch (err) {
     console.error(err);
-    res.status(500).send("Webhook error");
+    res.redirect(`${process.env.FRONT_END_URL}/payment/failure`);
   }
 };

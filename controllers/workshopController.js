@@ -1,4 +1,4 @@
-const { Parser } = require("json2csv");
+const { Parser, Transform } = require("json2csv");
 const WorkshopRegistration = require("../models/WorkshopRegistration");
 const catchAsync = require("../utils/catchAsync");
 const WorkshopFeedback = require("../models/formModel");
@@ -67,7 +67,69 @@ exports.getWorkshops = catchAsync(async (req, res) => {
 });
 
 exports.exportWorkshops = catchAsync(async (req, res) => {
-  let { from, to, type } = req.query;
+  let { from, to, type = "workshop" } = req.query;
+
+  let query = { type };
+  if (from || to) {
+    query.createdAt = {};
+    if (from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+      query.createdAt.$gte = startOfDay;
+    }
+    if (to) {
+      const endOfDay = new Date(to);
+      endOfDay.setHours(23, 59, 59, 999);
+      query.createdAt.$lte = endOfDay;
+    }
+  }
+
+  console.log("Export query:", query);
+
+  const count = await WorkshopRegistration.countDocuments(query);
+  console.log("Matched docs:", count);
+
+  const fields = [
+    { label: "Full Name", value: "fullName" },
+    {
+      label: "Date of Birth",
+      value: (row) =>
+        row.dateOfBirth
+          ? new Date(row.dateOfBirth).toISOString().split("T")[0]
+          : "",
+    },
+    { label: "Gender", value: "gender" },
+    { label: "Email", value: "email" },
+    { label: "Mobile Number", value: "mobileNumber" },
+    { label: "College Name", value: "collegeName" },
+    { label: "Branch", value: "branch" },
+    { label: "Year", value: "year" },
+    { label: "University Roll No", value: "universityRollNo" },
+    {
+      label: "Registered At",
+      value: (row) =>
+        row.createdAt
+          ? new Date(row.createdAt).toISOString().split("T")[0]
+          : "",
+    },
+  ];
+
+  res.header("Content-Type", "text/csv");
+  res.attachment("workshops.csv");
+
+  const json2csv = new Transform(
+    { fields },
+    { objectMode: true, highWaterMark: 16384, encoding: "utf-8" }
+  );
+
+  // Stream MongoDB results
+  const cursor = WorkshopRegistration.find(query).lean().cursor();
+
+  cursor.pipe(json2csv).pipe(res);
+});
+
+exports.exportGenerativeAIWorkshops = catchAsync(async (req, res) => {
+  let { from, to, type = "generative-ai" } = req.query;
 
   let query = { type };
   if (from || to) {
@@ -85,29 +147,48 @@ exports.exportWorkshops = catchAsync(async (req, res) => {
   }
 
   const fields = [
-    "fullName",
-    "dateOfBirth",
-    "gender",
-    "email",
-    "mobileNumber",
-    "collegeName",
-    "branch",
-    "year",
-    "universityRollNo",
+    { label: "Full Name", value: "fullName" },
+    {
+      label: "Date of Birth",
+      value: (row) =>
+        row.dateOfBirth
+          ? new Date(row.dateOfBirth).toISOString().split("T")[0]
+          : "",
+    },
+    { label: "Gender", value: "gender" },
+    { label: "Email", value: "email" },
+    { label: "Mobile Number", value: "mobileNumber" },
+    { label: "College Name", value: "collegeName" },
+    { label: "Branch", value: "branch" },
+    { label: "Year", value: "year" },
+    { label: "University Roll No", value: "universityRollNo" },
+    { label: "Status", value: "status" },
+    { label: "Payment ID", value: "paymentInfo.paymentId" },
+    { label: "Order ID", value: "paymentInfo.orderId" },
+    { label: "Signature", value: "paymentInfo.signature" },
+    { label: "Amount", value: "paymentInfo.amount" },
+    { label: "Method", value: "paymentInfo.method" },
+    {
+      label: "Registered At",
+      value: (row) =>
+        row.createdAt
+          ? new Date(row.createdAt).toISOString().split("T")[0]
+          : "",
+    },
   ];
-
-  const records = await WorkshopRegistration.find(query)
-    .select(fields.join(" "))
-    .lean();
-
-  console.log("records", records);
-
-  const parser = new Parser({ fields });
-  const csv = parser.parse(records);
 
   res.header("Content-Type", "text/csv");
   res.attachment("workshops.csv");
-  res.send(csv);
+
+  const json2csv = new Transform(
+    { fields },
+    { objectMode: true, highWaterMark: 16384, encoding: "utf-8" }
+  );
+
+  // Stream MongoDB results
+  const cursor = WorkshopRegistration.find(query).lean().cursor();
+
+  cursor.pipe(json2csv).pipe(res);
 });
 
 exports.getFeedbacks = catchAsync(async (req, res) => {
@@ -197,31 +278,43 @@ exports.exportFeedbacks = catchAsync(async (req, res) => {
   }
 
   const fields = [
-    "firstName",
-    "lastName",
-    "collegeName",
-    "enrolmentNumber",
-    "contactNumber",
-    "emailId",
-    "overallSatisfaction",
-    "topicRelevance",
-    "trainerEffectiveness",
-    "overallExperience",
-    "additionalComments",
-    "submittedAt",
-    "workshopDate",
+    { label: "First Name", value: "firstName" },
+    { label: "Last Name", value: "lastName" },
+    { label: "College Name", value: "collegeName" },
+    { label: "Enrollment Number", value: "enrolmentNumber" },
+    { label: "Contact Number", value: "contactNumber" },
+    { label: "Email ID", value: "emailId" },
+    { label: "Overall Satisfaction", value: "overallSatisfaction" },
+    { label: "Topic Relevance", value: "topicRelevance" },
+    { label: "Trainer Effectiveness", value: "trainerEffectiveness" },
+    { label: "Overall Experience", value: "overallExperience" },
+    { label: "Additional Comments", value: "additionalComments" },
+    {
+      label: "Submitted At",
+      value: (row) =>
+        row.submittedAt
+          ? new Date(row.submittedAt).toISOString().split("T")[0]
+          : "",
+    },
+    {
+      label: "Workshop Date",
+      value: (row) =>
+        row.workshopDate
+          ? new Date(row.workshopDate).toISOString().split("T")[0]
+          : "",
+    },
   ];
-
-  const records = await WorkshopFeedback.find(query)
-    .select(fields.join(" "))
-    .lean();
-
-  console.log("records", records);
-
-  const parser = new Parser({ fields });
-  const csv = parser.parse(records);
 
   res.header("Content-Type", "text/csv");
   res.attachment("workshops.csv");
-  res.send(csv);
+
+  const json2csv = new Transform(
+    { fields },
+    { objectMode: true, highWaterMark: 16384, encoding: "utf-8" }
+  );
+
+  // Stream MongoDB results
+  const cursor = WorkshopFeedback.find(query).lean().cursor();
+
+  cursor.pipe(json2csv).pipe(res);
 });

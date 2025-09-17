@@ -1,3 +1,4 @@
+const Otp = require("../models/Otp");
 const WorkshopRegistration = require("../models/WorkshopRegistration");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
@@ -97,5 +98,90 @@ exports.registerWorkshop = catchAsync(async (req, res, next) => {
   res.status(201).json({
     success: true,
     registration,
+  });
+});
+
+exports.sendOtp = catchAsync(async (req, res, next) => {
+  const { mobileNumber, type = "general" } = req.body;
+
+  if (!mobileNumber) {
+    return res.status(400).json({ message: "Mobile number is required" });
+  }
+
+  // 1. Generate 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000);
+
+  // 2. Expiry (5 min)
+  const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+  // 3. Remove old OTPs for same number + type (optional cleanup)
+  await Otp.deleteMany({ phone: mobileNumber, type });
+
+  // 4. Save OTP in DB
+  const registration = await Otp.create({
+    phone: mobileNumber,
+    otp,
+    otpExpiresAt,
+    type,
+  });
+
+  // 5. Send OTP via SMS (placeholder)
+  // e.g., await smsService.send(mobileNumber, `Your OTP is ${otp}`);
+
+  res.status(201).json({
+    success: true,
+    message: "OTP sent successfully",
+    otp: process.env.NODE_ENV === "development" ? otp : undefined, // only send in dev
+    registration,
+  });
+});
+
+exports.verifyOtp = catchAsync(async (req, res, next) => {
+  const { mobileNumber, otp, type = "general" } = req.body;
+
+  console.log("req body", req.body);
+  
+
+  if (!mobileNumber || !otp) {
+    return res
+      .status(400)
+      .json({ message: "Mobile number and OTP are required" });
+  }
+
+  // 1. Find OTP entry
+  const otpRecord = await Otp.findOne({
+    phone: mobileNumber,
+    type,
+  }).sort({ createdAt: -1 }); // take latest if multiple
+
+  // 2. Check existence
+  if (!otpRecord) {
+    return res
+      .status(400)
+      .json({ success: false, message: "OTP not found or expired" });
+  }
+
+  // 3. Check expiry
+  if (otpRecord.otpExpiresAt < new Date()) {
+    await Otp.deleteOne({ _id: otpRecord._id });
+    return res.status(400).json({ success: false, message: "OTP expired" });
+  }
+
+  // 4. Check match
+  if (otpRecord.otp !== parseInt(otp, 10)) {
+    return res.status(400).json({ success: false, message: "Invalid OTP" });
+  }
+
+  // 5. Mark verified + cleanup
+  otpRecord.verified = true;
+  await otpRecord.save();
+
+  // Optional: delete after verification so OTP can’t be reused
+  await Otp.deleteMany({ phone: mobileNumber, type });
+
+  res.status(200).json({
+    success: true,
+    verified: true,
+    message: "OTP verified successfully",
   });
 });

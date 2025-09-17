@@ -28,6 +28,10 @@ const workshopRegistrationSchema = new mongoose.Schema(
       required: true,
       match: [/^[0-9]{10}$/, "Please enter a valid 10-digit mobile number"],
     },
+    isMobileVerified: {
+      type: Boolean,
+      default: false,
+    },
     collegeName: {
       type: String,
       required: true,
@@ -60,8 +64,9 @@ const workshopRegistrationSchema = new mongoose.Schema(
       default: "pending",
     },
     paymentInfo: {
-      paymentId: { type: String },
-      paymentLinkId: { type: String },
+      paymentId: { type: String }, // razorpay_payment_id
+      orderId: { type: String }, // razorpay_order_id
+      signature: { type: String }, // razorpay_signature
       amount: { type: Number },
       method: { type: String },
     },

@@ -23,7 +23,7 @@ const studentFaqRoutes = require("./routes/studentFaqRoutes");
 const studentHeroSectionRoutes = require("./routes/StudentHeroSectionRoutes");
 const studentContentRoutes = require("./routes/StudentContentRoutes");
 const studentReviewRoutes = require("./routes/studentReviewRoutes");
-const studentRazorpayRoutes = require("./routes/studentRazorpayRoutes");
+const studentPaymentRoutes = require("./routes/studentPaymentRoutes");
 
 const adminRoutes = require("./routes/adminRoutes");
 const adminStudentRoutes = require("./routes/adminStudentRoutes");
@@ -105,7 +105,7 @@ app.use("/api/student/faqs", studentFaqRoutes);
 app.use("/api/student/content/hero-section", studentHeroSectionRoutes);
 app.use("/api/student/content", studentContentRoutes);
 app.use("/api/student/reviews", studentReviewRoutes);
-app.use("/api/razorpay", studentRazorpayRoutes);
+app.use("/api/student/payments", studentPaymentRoutes);
 
 // admin routes
 app.use("/api/admin/admins", adminRoutes);

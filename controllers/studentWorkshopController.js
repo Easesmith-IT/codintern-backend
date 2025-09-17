@@ -1,3 +1,4 @@
+const { default: axios } = require("axios");
 const Otp = require("../models/Otp");
 const WorkshopRegistration = require("../models/WorkshopRegistration");
 const AppError = require("../utils/appError");
@@ -112,7 +113,7 @@ exports.sendOtp = catchAsync(async (req, res, next) => {
   const otp = Math.floor(100000 + Math.random() * 900000);
 
   // 2. Expiry (5 min)
-  const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
+  const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
   // 3. Remove old OTPs for same number + type (optional cleanup)
   await Otp.deleteMany({ phone: mobileNumber, type });
@@ -126,7 +127,12 @@ exports.sendOtp = catchAsync(async (req, res, next) => {
   });
 
   // 5. Send OTP via SMS (placeholder)
-  // e.g., await smsService.send(mobileNumber, `Your OTP is ${otp}`);
+
+  const apiUrl = `https://manage.txly.in/vb/apikey.php?apikey=VZmZRZjXXsysZAAx&senderid=CODTRN&templateid=1707175809237902265&number=${mobileNumber}&message= Your One Time Password (OTP) for CodIntern is: ${otp} It is valid for 15 minutes only. Please do not share this OTP with anyone. CODINTERN PRIVATE LIMITED`;
+
+  // Send the OTP via the API using axios
+  const apiResponse = await axios.get(apiUrl);
+  console.log(apiResponse, "api response");
 
   res.status(201).json({
     success: true,
@@ -140,7 +146,6 @@ exports.verifyOtp = catchAsync(async (req, res, next) => {
   const { mobileNumber, otp, type = "general" } = req.body;
 
   console.log("req body", req.body);
-  
 
   if (!mobileNumber || !otp) {
     return res

@@ -128,7 +128,7 @@ exports.sendOtp = catchAsync(async (req, res, next) => {
 
   // 5. Send OTP via SMS (placeholder)
 
-  const apiUrl = `https://manage.txly.in/vb/apikey.php?apikey=VZmZRZjXXsysZAAx&senderid=CODTRN&templateid=1707175809237902265&number=${mobileNumber}&message= Your One Time Password (OTP) for CodIntern is: ${otp} It is valid for 15 minutes only. Please do not share this OTP with anyone. CODINTERN PRIVATE LIMITED`;
+  const apiUrl = `https://manage.txly.in/vb/apikey.php?apikey=VZmZRZjXXsysZAAx&senderid=CODTRN&templateid=1707175809237902265&number=${mobileNumber}&message= Your One Time Password (OTP) for CodIntern is: ${otp} It is valid for 15 minutes only. Please do not share this OTP with anyone. CODINTERN PRIVATE LIMITED`;
 
   // Send the OTP via the API using axios
   const apiResponse = await axios.get(apiUrl);

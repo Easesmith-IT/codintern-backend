@@ -9,16 +9,16 @@ const workshopRegistrationSchema = new mongoose.Schema(
     },
     dateOfBirth: {
       type: Date,
-      required: true,
+      required: false,
     },
     gender: {
       type: String,
-      enum: ["male", "female", "other"],
-      required: true,
+      // enum: ["male", "female", "other"],
+      required: false,
     },
     email: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
       lowercase: true,
       match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"],
@@ -34,23 +34,23 @@ const workshopRegistrationSchema = new mongoose.Schema(
     },
     collegeName: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     branch: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     year: {
       type: String,
       //   enum: ["1", "2", "3", "4"],
-      enum: [1, 2, 3, 4],
-      required: true,
+      // enum: [1, 2, 3, 4],
+      required: false,
     },
     universityRollNo: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     type: {
@@ -69,6 +69,10 @@ const workshopRegistrationSchema = new mongoose.Schema(
       signature: { type: String }, // razorpay_signature
       amount: { type: Number },
       method: { type: String },
+    },
+    grade: {
+      type: String,
+      required: false,
     },
   },
   { timestamps: true }

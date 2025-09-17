@@ -22,25 +22,34 @@ exports.registerWorkshop = catchAsync(async (req, res, next) => {
     type,
   } = req.body;
 
+  // if (
+  //   !fullName ||
+  //   !dateOfBirth ||
+  //   !gender ||
+  //   !email ||
+  //   !mobileNumber ||
+  //   !collegeName ||
+  //   !branch ||
+  //   !year ||
+  //   !universityRollNo ||
+  //   !type
+  // ) {
+  //   return res.status(400).json({ message: "All fields are required" });
+  // }
+
   if (
     !fullName ||
-    !dateOfBirth ||
-    !gender ||
     !email ||
     !mobileNumber ||
-    !collegeName ||
-    !branch ||
-    !year ||
-    !universityRollNo ||
     !type
   ) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   // extra validation (optional - though Mongoose handles enum)
-  if (![1, 2, 3, 4].includes(Number(year))) {
-    return res.status(400).json({ message: "Year must be 1, 2, 3, or 4" });
-  }
+  // if (![1, 2, 3, 4].includes(Number(year))) {
+  //   return res.status(400).json({ message: "Year must be 1, 2, 3, or 4" });
+  // }
 
   const existing = await WorkshopRegistration.findOne({
     $or: [

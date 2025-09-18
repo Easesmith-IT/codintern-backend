@@ -20,6 +20,7 @@ exports.registerWorkshop = catchAsync(async (req, res, next) => {
     year,
     universityRollNo,
     type,
+    grade,
   } = req.body;
 
   // if (
@@ -37,12 +38,7 @@ exports.registerWorkshop = catchAsync(async (req, res, next) => {
   //   return res.status(400).json({ message: "All fields are required" });
   // }
 
-  if (
-    !fullName ||
-    !email ||
-    !mobileNumber ||
-    !type
-  ) {
+  if (!fullName || !email || !mobileNumber || !type) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -82,6 +78,7 @@ exports.registerWorkshop = catchAsync(async (req, res, next) => {
     year,
     universityRollNo,
     type,
+    grade,
   });
 
   const htmlContent = getGenerativeAiWorkshopRegistrationEmailTemplate({

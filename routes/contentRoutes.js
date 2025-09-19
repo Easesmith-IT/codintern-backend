@@ -3,8 +3,14 @@ const router = express.Router();
 const {
   getContentByPage,
   upsertContentSection,
+  createSeo,
+  getSeoByPage,
 } = require("../controllers/contentController");
 const upload = require("../middlewares/imgUpload");
+
+router.post("/create-seo", createSeo);
+
+router.get("/get-seo", getSeoByPage);
 
 // If you expect multiple images for a section, e.g., `images[]`
 router.post(

@@ -5,6 +5,7 @@ const catchAsync = require("../utils/catchAsync");
 const parseIfString = require("../utils/parseIfString");
 const { uploadImage } = require("../utils/fileUploadToAzure");
 const AppError = require("../utils/appError");
+const Seo = require("../models/content/Seo");
 
 // 🔹 Upsert content (create or update)
 exports.upsertContentSection = catchAsync(async (req, res, next) => {
@@ -119,3 +120,50 @@ exports.getContentByPage = catchAsync(async (req, res, next) => {
 //     data: content,
 //   });
 // });
+
+exports.createSeo = catchAsync(async (req, res, next) => {
+  const { pageName, keywords, description, title } = req.body;
+
+  if (!pageName) {
+    // return res.status(400).json({
+    //   status: false,
+    //   message: "pageName is required",
+    // });
+    return next(new AppError("Page Name is required", 400));
+  }
+
+  // Build update object dynamically
+  const updateData = {};
+  if (keywords) updateData.keywords = keywords;
+  if (description) updateData.description = description;
+  if (title) updateData.title = title;
+
+  // Use MongoDB upsert (create if not exists, update if exists)
+  const seo = await Seo.findOneAndUpdate(
+    { pageName: new RegExp(`^${pageName}$`, "i") }, // case-insensitive
+    { $set: updateData, $setOnInsert: { pageName } }, // don't overwrite pageName on update
+    { new: true, upsert: true, runValidators: true }
+  );
+
+  return res.status(200).json({
+    status: true,
+    message: "SEO entry created/updated successfully",
+    seo,
+  });
+});
+
+exports.getSeoByPage = catchAsync(async (req, res, next) => {
+  console.log("req.query", req.query);
+  const { pageName } = req.query;
+
+  const seo = await Seo.findOne({ pageName });
+
+  console.log("seo", seo);
+
+
+  res.status(200).json({
+    status: true,
+    seo,
+    message: "here's the seo",
+  });
+});

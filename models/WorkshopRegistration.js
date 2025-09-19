@@ -83,10 +83,10 @@ workshopRegistrationSchema.index(
   { mobileNumber: 1, type: 1 },
   { unique: true }
 );
-workshopRegistrationSchema.index(
-  { universityRollNo: 1, type: 1 },
-  { unique: true }
-);
+// workshopRegistrationSchema.index(
+//   { universityRollNo: 1, type: 1 },
+//   { unique: true }
+// );
 
 // 🔹 Auto-update status before saving
 workshopRegistrationSchema.pre("save", function (next) {
